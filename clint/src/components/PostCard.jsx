@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import TextInput from './TextInput';
 import Loading from './Loading';
 import CustomButton from './CustomButton';
+import { deletePost } from '../utils';
 
 const CommentForm = ({ user, id, replyAt, getComments }) => {
     const [loading, setLoading] = useState(false)

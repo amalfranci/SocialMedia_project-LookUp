@@ -8,6 +8,7 @@ import { BsBriefcase, BsFacebook, BsInstagram, BsPersonFillAdd } from 'react-ico
 import {FaTwitterSquare} from "react-icons/fa"
 import { CiLocationOn } from "react-icons/ci"
 import moment from 'moment/moment'
+import { deletePost } from '../utils'
 
 
 function ProfileCard({user}) {

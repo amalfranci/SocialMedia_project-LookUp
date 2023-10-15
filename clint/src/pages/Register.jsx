@@ -6,8 +6,13 @@ import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { BgImage } from '../assets'
+import { apiRequest } from '../utils'
+
 
 function Register() {
+    const [errMsg, setErrMsg] = useState("")
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const dispatch=useDispatch()
 
     const {
         register,
@@ -17,12 +22,40 @@ function Register() {
     } = useForm({ mode: "onChange" })
 
     const onSubmit = async (data) => {
+        setIsSubmitting(true)
+        try {
+
+            const res = await apiRequest({
+                url: "/auth/register",
+                data: data,
+                method: "POST"
+            });
+
+            console.log(res)
+            if (res?.status === "failed")
+            {
+                setErrMsg(res)
+            }
+            else {
+                setErrMsg(res)
+                setTimeout(() => {
+                    window.location.replace("/login")
+                },5000)
+            }
+            setIsSubmitting(false)
+
+
+            
+        } catch (error)
+        {
+            console.log(error)
+            setIsSubmitting(false)
+
+        }
         
     }
     
-    const [errMsg, setErrMsg] = useState("")
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const dispatch=useDispatch()
+    
   return (
       <div className='bg-bgColor w-full h-[100vh] flex items-center justify-center p-6'>
           
@@ -140,7 +173,7 @@ function Register() {
                  
 
                       {errMsg?.message && (
-                          <span className={`text-sm ${errMsg?.status=="failed" ?
+                          <span className={`text-sm ${errMsg?.status==="failed" ?
                            "text-[#f64949fe]":"text-[#2ba150fe]" } mt-0.5`}>
                               {errMsg?.message}  </span>
                       )}

@@ -9,6 +9,7 @@ import { BsMoon, BsSunFill } from "react-icons/bs"
 import {IoMdNotificationsOutline} from "react-icons/io"
 import { SetTheme } from '../redux/theme'
 import { Logout } from '../redux/userSlice'
+import { fetchPosts } from '../utils'
 
 
 
@@ -31,6 +32,7 @@ function TopBar() {
         dispatch(SetTheme(themeValue))
     }
     const handleSearch = async (data) => {
+        await fetchPosts (user.token,dispatch,"",data)
         
     }
   return (
