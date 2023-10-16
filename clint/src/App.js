@@ -1,5 +1,6 @@
 import { Outlet, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Home, Login, Profile, Register, ResetPassword } from "./pages";
+import Adminlogin from "./components/adminpage/AdminLogin";
 
 import {  useSelector } from "react-redux/es/hooks/useSelector";
 
@@ -31,7 +32,8 @@ function App() {
 
         <Route element={<Layout/>} >
         <Route path="/" element={<Home />} />
-        <Route path="/profile/:id?" element={<Profile />} />
+          <Route path="/profile/:id?" element={<Profile />} />
+         <Route index={true} path="/adminlogin" element={<Adminlogin />} />
         </Route>
 
         <Route path="/register" element={<Register />} />
