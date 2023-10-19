@@ -105,7 +105,7 @@ function PostCard({ post, user, deletePost, likePost }) {
                   {
                       showall === post?._id
                        ? post?.description
-                       : post?.description.slice(0, 300)
+                       : post?.description?.slice(0, 300)
                   }
                   {
                       post?.description?.length > 301 && (
