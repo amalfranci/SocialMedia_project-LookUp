@@ -8,7 +8,8 @@ import { useForm } from 'react-hook-form';
 import TextInput from './TextInput';
 import Loading from './Loading';
 import CustomButton from './CustomButton';
-import { deletePost } from '../utils';
+import { apiRequest } from '../utils';
+
 
 const CommentForm = ({ user, id, replyAt, getComments }) => {
     const [loading, setLoading] = useState(false)
@@ -63,7 +64,8 @@ const CommentForm = ({ user, id, replyAt, getComments }) => {
         
     )
 }
-function PostCard({ post, user, deletePost, likePost }) {
+function PostCard({ post, user, deletePost, like }) {
+   
     
     const [showall, setShowAll] = useState(0)
     const [showReply, setShowReply] = useState(0);
@@ -71,7 +73,22 @@ function PostCard({ post, user, deletePost, likePost }) {
     const [loading, setLoading] = useState(false)
     const [replyComments, setReplyComments] = useState(0)
     const [showComments, setShowComments] = useState(0)
-    const getComments=async()=>{}
+  
+   
+
+    // for post comment
+    const getComments = async () => { 
+      
+    }
+
+
+
+    // for post like
+const handleLike = async (uri) => {
+    await like(uri)
+    await getComments(post?._id)
+      
+    }
   return (
       <div className='mb-2 bg-primary p-4 rounded-xl'>
           <div className='flex gap-3 items-center mb-2'>
@@ -125,7 +142,8 @@ function PostCard({ post, user, deletePost, likePost }) {
           <div className='mt-4 flex justify-between items-center px-3 py-2 text-ascent text-base border-t border-[#66666645]'>
               
               <p
-              className='flex gap-2 items-center text-base cursor-pointer'>
+                  className='flex gap-2 items-center text-base cursor-pointer'
+              onClick={()=>handleLike("/posts/like/"+post?._id)}>
                   {post?.likes?.includes(user?._id) ? (
                       <BiSolidLike size={20} color='blue'/>
                   ) : (<BiLike size={20} />)}

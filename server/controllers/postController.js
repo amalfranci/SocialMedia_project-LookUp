@@ -1,7 +1,7 @@
 import Posts from "../models/postModel.js"
 import Users from "../models/userModel.js";
 import Comments from "../models/commentModel.js"
-import { posts } from "../../clint/src/assets/data.js";
+
 
 
 export const createPost = async (req, res, next) =>
@@ -191,40 +191,33 @@ export const getComments = async (req, res, next) => {
 
 export const likePost = async (req, res, next) => {
   try {
+    const { userId } = req.body.user;
+    const { id } = req.params;
 
-    const { userId } = req.body.user
-    const { id } = req.params
-    const post = await Posts.findById(id)
+    const post = await Posts.findById(id);
+
     const index = post.likes.findIndex((pid) => pid === String(userId));
 
-    if (index === -1)
-    {
-      post.likes.push(userId)
+    if (index === -1) {
+      post.likes.push(userId);
+    } else {
+      post.likes = post.likes.filter((pid) => pid !== String(userId));
+    }
 
-    }
-    else {
-      post.likes=post.likes.filter((pid)=pid!== String(userId))
-    }
     const newPost = await Posts.findByIdAndUpdate(id, post, {
-      new:true
-    })
-    res.status(200).json({
-      success: true,
-      message: Sucessfully,
-      data:newPost
-    })
-    
-  }
-  catch (error)
-  {
-    console.log(error)
-    res.status(404).json({
-      message:error.message
-    })
-  }
-  
-}
+      new: true,
+    });
 
+    res.status(200).json({
+      sucess: true,
+      message: "successfully",
+      data: newPost,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ message: error.message });
+  }
+};
 export const likePostComment = async (req, res, next) => {
   const { userId } = req.body.user;
   const { id, rid } = req.params;
@@ -304,7 +297,7 @@ export const commentPost = async (req, res, next) => {
     await newComment.save()
     const post = await Posts.findById(id)
     post.comments.push(newComment._id)
-    const updatedPost = await posts.findByIdAndUpdate(id, post, {
+    const updatedPost = await Posts.findByIdAndUpdate(id, post, {
       new: true,
       
     })
@@ -325,8 +318,35 @@ export const replyPostComment = async (req, res, next) => {
   const { userId } = req.body.user
   const { comment, replyAt, from } = req.body
   const { id } = req.params
+
+  if (comment === null)
+  {
+   return res.status(404).json({ message: "comment is required" })
+    
+  }
+  try {
+    const commentInfo = await Comments.findById(id)
+    commentInfo.replies.push({
+      comment,
+      replyAt,
+      from,
+      userId,
+      created_At:Date.now()
+
+    })
+    commentInfo.save()
+
+    res.status(200).json(commentInfo)
+    
+  }
+  catch (error)
+  {
+    console.log(error)
+    res.status(404).json({message:error.message})
+
+  }
   
-  
+
   
 
 }

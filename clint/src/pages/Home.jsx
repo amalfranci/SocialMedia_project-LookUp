@@ -8,8 +8,9 @@ import { BsFiletypeGif, BsPersonFillAdd } from 'react-icons/bs'
 import { BiImages, BiSolidVideo } from 'react-icons/bi'
 import { useForm } from 'react-hook-form'
 import { useEffect } from 'react'
-import { apiRequest, deletePost, fetchPosts, handleFileUpload } from '../utils'
+import { apiRequest, deletePost, fetchPosts, handleFileUpload,likePost } from '../utils'
 import { useDispatch } from 'react-redux'
+
 
 function Home() {
 
@@ -72,6 +73,16 @@ function Home() {
         setLoading(false)
         
     }
+
+    const handleLikePost = async (uri) => {
+
+        await likePost({ uri: uri, token: user?.token })
+        await fetchPost()
+        
+
+    }
+
+
     const handleDelete = async (id) => {
         await deletePost(id, user.token)
         await fetchPost()
@@ -189,11 +200,13 @@ function Home() {
                       
                   </form>
                   {loading ? (<Loading />) : posts?.length > 0 ? (posts?.map((post) => (
-                      <PostCard key={post?._id} post={post}
+                      <PostCard
+                          key={post?._id}
+                          post={post}
                       
                           user={user}
                          deletePost={handleDelete}
-                          like={()=>{}}
+                          like={handleLikePost}
                       />
                   ))): (
                       
