@@ -11,6 +11,7 @@ import TableRow from '@mui/material/TableRow';
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { blockUser, getUsersList } from '../../../utils';
+import swal from 'sweetalert'
 
 export default function Userlist() {
   const [page, setPage] = useState(0);
@@ -35,24 +36,39 @@ export default function Userlist() {
     setPage(0);
   };
 
- const handleBlockUser = async (userId) => {
+  const handleBlockUser = async (userId, currentStatus) => {
   try {
-    const action = "block"; // You can change this to "unblock" as needed
-
-    const response = await blockUser(userId, action);
-
-
-    if (response && response.user) {
+    // Use SweetAlert to display a confirmation dialog
+    swal({
+      title: `Are you sure you want to ${currentStatus === "blocked" ? "unblock" : "block"} this user?`,
   
-      // Assuming your server returns the updated user data, you can update the local state accordingly
-      const updatedRows = rows.map((row) =>
-        row._id === userId ? { ...row, status: response.user.status } : row
-      );
-      setRows(updatedRows);
-    } else {
-      // Handle the case where the response is not successful
-      console.error("Failed to block/unblock the user.");
-    }
+      icon: "warning",
+      buttons: ["Cancel", "Confirm"],
+      dangerMode: true,
+    })
+    .then(async (confirmed) => {
+      if (confirmed) {
+        const action = currentStatus === "blocked" ? "unblock" : "block";
+
+        const response = await blockUser(userId, action);
+
+        if (response && response.user) {
+          // Assuming your server returns the updated user data, you can update the local state accordingly
+          const updatedRows = rows.map((row) =>
+            row._id === userId
+              ? { ...row, status: response.user.status }
+              : row
+          );
+          setRows(updatedRows);
+        } else {
+          // Handle the case where the response is not successful
+          console.error(`Failed to ${action} the user.`);
+        }
+      } else {
+        // User canceled the action
+        console.log("Action canceled");
+      }
+    });
   } catch (error) {
     console.error(error.message);
   }
@@ -113,13 +129,14 @@ export default function Userlist() {
                     <TableCell align="left">{formatDate(row.createdAt)}</TableCell>
                     <TableCell align="left">{row?.profession}</TableCell>
                     <TableCell align="left">
-                      <Button
-                        variant="contained"
-                        color="error"
-                        onClick={() => handleBlockUser(row._id)}
-                      >
-                        Block
-                      </Button>
+                    <Button
+  variant="contained"
+  color="error"
+  onClick={() => handleBlockUser(row._id, row.status)} // Pass the current status
+>
+  {row.status === "blocked" ? "Unblock" : "Block"}
+</Button>
+
                     </TableCell>
                   </TableRow>
                 );

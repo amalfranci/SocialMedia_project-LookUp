@@ -41,8 +41,8 @@ const userSchema = new mongoose.Schema({
     verified: { type: Boolean, default: false },
      status: {
         type: String,
-        enum: ["active", "blocked", "unblocked"],
-        default: "active" 
+        enum: ["blocked", "unblocked"],
+        default: "unblocked" 
     },
 
     
