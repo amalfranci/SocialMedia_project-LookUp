@@ -21,17 +21,10 @@ export function createJWT(id) {
     })
 }
 
-// const generateAdminToken = (res, id) => {
-    
-//     const token = JWT.sign({ id }, process.env.JWT_SECRET_KEY, {
-        
-//         expiresIn:"2d",
-//     })
-  
-// }
+
 export function generateAdminToken(id)
 {
-    return JWT.sign({ id }, process.env.JWT_SECRET_KEY, {
+    return JWT.sign({adminId: id }, process.env.JWT_SECRET_KEY, {
         
         expiresIn:"2d",
     })

@@ -106,3 +106,35 @@ export const likePost = async ({ uri, token }) => {
     }
     
 }
+
+// admin side
+export const getUsersList = async () => {
+    try {
+        const users = await apiRequest({
+            url: '/admin/userslist',
+           method: "GET",
+            
+        })
+        return users
+        
+    }
+    catch (error)
+    {
+        console.error(error.message)
+
+    }
+}
+
+export const blockUser = async (userId,  action) => {
+    try {
+        const res = await apiRequest({
+             url: `/admin/users/${userId}/block`,
+          
+            method: "POST",
+            data: { action: action },
+        });
+        return res;
+    } catch (error) {
+        console.error(error);
+    }
+}
