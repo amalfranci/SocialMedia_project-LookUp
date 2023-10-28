@@ -34,21 +34,28 @@ export const apiRequest = async ({ url, token, data, method }) => {
 }
 
 export const handleFileUpload = async (uploadFile) => {
-    const formData = new FormData()
-    formData.append("file", uploadFile)
-    formData.append("upload_preset", "socialmedia")
+    const formData = new FormData();
+    
+    formData.append("file", uploadFile);
+    formData.append("upload_preset", uploadFile==='image' ? 'socialmedia_image':'socialmedia_video');
+
+   let resourceType = "auto"
+
+
     try {
         const response = await axios.post(
-            `http://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_ID}/image/upload/`,formData
-        ) 
+            `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_ID}/${resourceType}/upload/`,
+            formData
+        );
 
-        return response.data.secure_url
+        return response.data.secure_url;
+
+    } catch (error) {
+
         
-    } catch (error)
-    {
-
     }
 }
+
 
 export const fetchPosts = async (token, dispatch, uri, data) => {
     
@@ -83,5 +90,99 @@ export const deletePost = async (id, token) => {
     {
         console.log(error)
 
+    }
+}
+
+export const likePost = async ({ uri, token }) => {
+    try {
+        const res = await apiRequest({
+            
+            url: uri,
+            token: token,
+            method:"POST"
+        })
+        return res
+         
+
+       
+    }
+    catch (error)
+    {
+        console.log(error)
+
+    }
+    
+}
+
+export const getUserInfo = async (token, id) => {
+    try {
+        const uri = id === undefined ? "/users/get-user" : "/users/get-user/" + id
+        const res = await apiRequest({
+            
+            url: uri,
+            token: token,
+            method:"POST",
+        })
+        if (res?.message === "Authentication failed") {
+            localStorage.removeItem("user")
+            window.alert("User Session expired.Login again")
+            window.location.replace("/login")
+        }
+        return res?.user
+    } catch (error)
+    {
+       console.log(error)
+    }
+}
+
+// admin side
+export const getUsersList = async () => {
+    try {
+        const users = await apiRequest({
+            url: '/admin/userslist',
+           method: "GET",
+            
+        })
+        return users
+        
+    }
+    catch (error)
+    {
+        console.error(error.message)
+
+    }
+}
+
+export const blockUser = async (userId,  action) => {
+    try {
+        const res = await apiRequest({
+             url: `/admin/users/${userId}/block`,
+          
+            method: "POST",
+            data: { action: action },
+        });
+        return res;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export const sendFriendRequest = async (token, id) => {
+    
+    try {
+        const res = await apiRequest({
+            
+            url: "/users/friend-request",
+            token: token,
+            method: "POST",
+            data:{requestTo:id},
+        })
+        return
+    }
+     catch (error)
+    {
+        const err = error.response.data;
+        console.log(err)
+        return {status:err.success,message:err.message}
     }
 }

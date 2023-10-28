@@ -67,6 +67,10 @@ export const login = async (req, res, next) => {
             return
             
         }
+        if (user.status === "blocked") {
+            next("Your account is blocked. Please contact support for assistance.");
+            return;
+        }
 
         const isMatch = await compareString(password, user?.password)
         

@@ -26,7 +26,7 @@ function EditProfile() {
         
     })
 
-    const onSubmit = async (data) => {
+    const   onSubmit = async (data) => {
 
         setIsSubmitting(true)
         setErrMsg("")

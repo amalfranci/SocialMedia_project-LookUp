@@ -1,8 +1,13 @@
 import { Outlet, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { Home, Login, Profile, Register, ResetPassword } from "./pages";
 import Adminlogin from "./components/adminpage/AdminLogin";
+import { AdminHome } from "./components/adminpage/AdminHome";
+import { useSelector } from "react-redux/es/hooks/useSelector";
 
-import {  useSelector } from "react-redux/es/hooks/useSelector";
+import UserPage from "./components/admin_help_page/UserPage";
+import ComplaintToken from "./components/admin_help_page/ComplaintToken";
+   
+
 
 
 function Layout() {
@@ -20,6 +25,20 @@ function Layout() {
 }
 
 
+
+function Adminlayout() {
+  
+ const adminInfo = useSelector((state) => state.admin.adminInfo);
+
+  
+  const adminloaction = useLocation()
+  
+  return adminInfo ? (
+    <Outlet/>
+  ):(<Navigate to="/adminlogin" state={{from:adminloaction}} replace />)
+}
+
+
 function App() {
 
   const { theme } = useSelector((state) => state.theme)
@@ -33,16 +52,26 @@ function App() {
         <Route element={<Layout/>} >
         <Route path="/" element={<Home />} />
           <Route path="/profile/:id?" element={<Profile />} />
-         <Route index={true} path="/adminlogin" element={<Adminlogin />} />
+        
         </Route>
 
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/reset-password" element={<ResetPassword/>} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+
+          <Route path="/adminlogin" element={<Adminlogin />} />
+
+
+        {/* admin route */}
+         <Route element={<Adminlayout/>} >
+          <Route path="/adminHome" element={<AdminHome />} />
+          <Route path="/userlist" element={<UserPage />} />
+          <Route path="/token" element={<ComplaintToken/>}/>
+         </Route>
         
         
 
-
+       
 
       </Routes>
   

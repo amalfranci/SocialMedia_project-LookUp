@@ -20,3 +20,13 @@ export function createJWT(id) {
         expiresIn:"1d"
     })
 }
+
+
+export function generateAdminToken(id)
+{
+    return JWT.sign({adminId: id }, process.env.JWT_SECRET_KEY, {
+        
+        expiresIn:"2d",
+    })
+}
+

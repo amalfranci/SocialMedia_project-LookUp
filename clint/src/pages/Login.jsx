@@ -38,6 +38,7 @@ function Login() {
             else {
                 setErrMsg("")
                 const newData = { token: res?.token, ...res?.user };
+              
                 dispatch(UserLogin(newData))
                 window.location.replace("/")
             }
