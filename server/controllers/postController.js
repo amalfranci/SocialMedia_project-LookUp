@@ -9,7 +9,7 @@ export const createPost = async (req, res, next) =>
     try {
 
         const { userId } = req.body.user;
-        const { description, image } = req.body;
+        const { description, image,} = req.body;
         // if (!description)
         // {
         //     next('you must provide a description');
@@ -19,7 +19,10 @@ export const createPost = async (req, res, next) =>
         const post = await Posts.create({
             userId,
             description,
-            image
+          image,
+       
+            
+            
             
         })
         res.status(200).json({
@@ -39,62 +42,64 @@ export const createPost = async (req, res, next) =>
 
 export const getPosts = async (req, res, next) => {
     try {
-        const { userId } = req.body.user
-        const { search } = req.body
+        const { userId } = req.body.user;
+        const { search } = req.body;
 
-        const user = await Users.findById(userId)
+        const user = await Users.findById(userId);
         const friends = user?.friends?.toString().split(",") ?? [];
-        friends.push(userId)
+        friends.push(userId);
 
-        const searchPostQuery = {
-            $or: [
-                {
-                    description:{$regex: search,$options:"i"}
-                },
-            ],
+        let searchQuery;
 
+        if (search) {
+            searchQuery = {
+                $or: [
+                    {
+                        description: { $regex: search, $options: "i" }
+                    },
+                    {
+                        userId: {
+                            $in: await Users.find({
+                                firstName: { $regex: search, $options: "i" }
+                            }).distinct("_id")
+                        }
+                    }
+                ]
+            };
+        } else {
+            searchQuery = {}; // Empty query to fetch all posts when there's no search
         }
-        const posts = await Posts.find(search ? searchPostQuery : {}).populate({
+
+        const posts = await Posts.find(searchQuery).populate({
             path: "userId",
             select: "firstName lastName location profileUrl -password",
         }).sort({ _id: -1 });
 
         const friendsPosts = posts?.filter((post) => {
             return friends.includes(post?.userId?._id.toString())
-        })
-        const otherPosts = posts?.filter((post) => !friends.includes(post?.userId?._id.toString())
-        )
-          let postsRes = null;
+        });
 
-    if (friendsPosts?.length > 0) {
-      postsRes = search ? friendsPosts : [...friendsPosts, ...otherPosts];
-    } else {
-      postsRes = posts;
+        const otherPosts = posts?.filter((post) => !friends.includes(post?.userId?._id.toString()));
+
+        let postsRes = null;
+
+        if (friendsPosts?.length > 0) {
+            postsRes = search ? friendsPosts : [...friendsPosts, ...otherPosts];
+        } else {
+            postsRes = posts;
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "successfully",
+            data: postsRes,
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(404).json({ message: error.message });
     }
-
-    res.status(200).json({
-      sucess: true,
-      message: "successfully",
-      data: postsRes,
-    });
-        
-
-
-
-        
-    }
-    catch (error)
-    {
-         
-        console.log(error)
-        res.status(404).json({message:error.message})
-    
-
-    }
-
-
-    
-}
+};
 
 
 export const getPost = async (req, res, next) => {

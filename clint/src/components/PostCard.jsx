@@ -130,14 +130,19 @@ const handleLike = async (uri) => {
                       )
                   }
               </p>
-              {
-                  post?.image && (
-                      <img src={post?.image}
-                          alt='post image'
-                      className='w-full mt-2 rounded-lg'/>
-                  )
-              }
-              
+{post?.image && (
+  // Check if the URL ends with a common image file extension
+  /\.(jpg|jpeg|png)$/.test(post.image) ? (
+    <img src={post.image} alt="post image" style={{ maxHeight: "600px" }} className="w-full mt-2 rounded-lg" />
+  ) : (
+    <video controls width="100%" height="auto" style={{ maxHeight: "300px" }} className="w-full mt-2 rounded-lg">
+      <source src={post.image} type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  )
+)}
+
+
           </div>
           <div className='mt-4 flex justify-between items-center px-3 py-2 text-ascent text-base border-t border-[#66666645]'>
               

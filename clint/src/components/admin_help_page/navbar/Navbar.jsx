@@ -9,20 +9,25 @@ import MenuIcon from '@mui/icons-material/Menu';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { styled } from '@mui/material/styles';
 import { useAppStore } from './appStore.jsx';
+import { useDispatch } from 'react-redux';
+import { AdminLogout } from '../../../redux/adminSlice.js';
     
 
 
 
 const AppBar = styled(MuiAppBar, {
+  
 
 })(({ theme }) => ({
   zIndex: theme.zIndex.drawer + 1,
 
 }));
 export default function Navbar() {
+  const dispatch = useDispatch()
 
     const updateOpen = useAppStore((state) => state.updateOpen)
-       const dopen=useAppStore((state)=>state.dopen)
+  const dopen = useAppStore((state) => state.dopen)
+  
 
   return (
    
@@ -41,9 +46,9 @@ export default function Navbar() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            News
+            LookUp
           </Typography>
-          <Button color="inherit">Login</Button>
+          <Button color="inherit"  onClick={() => dispatch(AdminLogout())} >Logout</Button>
         </Toolbar>
       </AppBar>
     </Box>
