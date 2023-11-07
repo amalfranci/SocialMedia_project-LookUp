@@ -7,130 +7,100 @@ import { resetPasswordLink } from "../utils/sendEmail.js";
 import FriendRequest from "../models/friendRequest.js";
 
 export const verifyEmail = async (req, res) => {
+  const { userId, token } = req.params;
 
-    const { userId, token } = req.params
-    
-    try {
-        const result = await Verification.findOne({ userId })
-        
-        if (result) {
-            const { expiresAt, token: hashedToken } = result
-            // token has expire
-            if (expiresAt < Date.now()) {
+  try {
+    const result = await Verification.findOne({ userId });
 
-                await Verification.findOneAndDelete({ userId })
-                    .then(() => {
-                        Users.findByIdAndDelete({ userId })
-                            .then(() => {
-                                const message = "Verification token has expired"
-                                res.redirect(`/users/verified?status=error&message=${message}`)
-                            }).catch((err) => {
-                            res.redirect(`/users/verified?status=error&message=`)
-                        })
-                    })
-                    .catch((error) => {
-                        console.log(error)
-                        res.redirect(`/users/verified?message=`)
+    if (result) {
+      const { expiresAt, token: hashedToken } = result;
+      // token has expire
+      if (expiresAt < Date.now()) {
+        await Verification.findOneAndDelete({ userId })
+          .then(() => {
+            Users.findByIdAndDelete({ userId })
+              .then(() => {
+                const message = "Verification token has expired";
+                res.redirect(`/users/verified?status=error&message=${message}`);
+              })
+              .catch((err) => {
+                res.redirect(`/users/verified?status=error&message=`);
+              });
+          })
+          .catch((error) => {
+            console.log(error);
+            res.redirect(`/users/verified?message=`);
+          });
+      } else {
+        // token valid
+
+        compareString(token, hashedToken)
+          .then((isMatch) => {
+            if (isMatch) {
+              Users.findOneAndUpdate({ _id: userId }, { verified: true })
+                .then(() => {
+                  Verification.findOneAndDelete({ userId }).then(() => {
+                    const message = "Email verified successfull";
+                    res.redirect(
+                      `/users/verified?status=success&message=${message}`
+                    );
+                  });
                 })
-
+                .catch((err) => {
+                  console.log(err);
+                  const message = "verification failed or link is invalied";
+                  res.redirect(
+                    `/users/verified?status=error&message=${message}`
+                  );
+                });
+            } else {
+              const message = "verification failed or link is invalied";
+              res.redirect(`/users/verified?status=error&message=${message}`);
             }
-              else {
-            // token valid
-
-            compareString(token, hashedToken).then((isMatch) => {
-                if (isMatch)
-                {
-                    Users.findOneAndUpdate({ _id: userId }, { verified: true })
-                        .then(() => {
-                            Verification.findOneAndDelete({ userId }).then(() => {
-                                const message = "Email verified successfull"
-                                res.redirect(`/users/verified?status=success&message=${message}`)
-                        })
-                        }).catch((err) => {
-                            console.log(err)
-                            const message = "verification failed or link is invalied"
-                            res.redirect(`/users/verified?status=error&message=${message}`)
-                        })
-                    
-                    }
-                else {
-                        const message = "verification failed or link is invalied"
-                            res.redirect(`/users/verified?status=error&message=${message}`)
-
-
-                    
-                    }
-                 
-             })
-                .catch((err) => { 
-                     console.log(err)
-                        res.redirect(`/users/verified?message=`)
-
-                })
-
-            
-        }
-        }
-        else {
-            const message = "invalid verification link.try again later"
-             res.redirect(`/users/verified?status=error&message=${message}`)
-        }
-      
-      
-    } catch (err)
-    {
-        console.log(err)
-    res.redirect(`/users/verified?message=`)
-
+          })
+          .catch((err) => {
+            console.log(err);
+            res.redirect(`/users/verified?message=`);
+          });
+      }
+    } else {
+      const message = "invalid verification link.try again later";
+      res.redirect(`/users/verified?status=error&message=${message}`);
     }
-    
-
-    
-}
-
+  } catch (err) {
+    console.log(err);
+    res.redirect(`/users/verified?message=`);
+  }
+};
 
 export const requestPasswordReset = async (req, res) => {
-    
-    try {
+  try {
+    const { email } = req.body;
+    const user = await Users.findOne({ email });
 
-        const { email } = req.body
-        const user = await Users.findOne({ email })
-
-        if (!user) {
-            return res.status(404).json({
-                status: "Failed"
-                , message: "Email adress not found"
-            })
-        }
-        const existingRequest = await passwordReset.findOne({ email })
-        
-        if (existingRequest)
-        {
-            if (existingRequest.expiresAt>Date.now())
-        {
-            return res.status(201).json({
-                status: "PENDING",
-                message:"Reset password link has already been sent your email.",
-            })
-            
-            }
-            await passwordReset.findByIdAndDelete({email})
-        }
-        await resetPasswordLink(user,res)
-            
-        
-        
-    } catch (error) {
-        
-        console.log(error)
-        res.status(404).json({message:error.message})
-        
-
-
+    if (!user) {
+      return res.status(404).json({
+        status: "Failed",
+        message: "Email adress not found",
+      });
     }
-    
-   
-}
+    const existingRequest = await passwordReset.findOne({ email });
+
+    if (existingRequest) {
+      if (existingRequest.expiresAt > Date.now()) {
+        return res.status(201).json({
+          status: "PENDING",
+          message: "Reset password link has already been sent your email.",
+        });
+      }
+      await passwordReset.findByIdAndDelete({ email });
+    }
+    await resetPasswordLink(user, res);
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ message: error.message });
+  }
+};
 
 export const resetPassword = async (req, res) => {
   const { userId, token } = req.params;
@@ -198,97 +168,85 @@ export const changePassword = async (req, res, next) => {
 };
 
 export const getUser = async (req, res, next) => {
-  
-
   try {
-    const { userId } = req.body.user
-    const { id } = req.params
+    const { userId } = req.body.user;
+    const { id } = req.params;
+
     const user = await Users.findById(id ?? userId).populate({
       path: "friends",
-      select:"-password",
-    })
-    if (!user)
-    {
+      select: "-password",
+    });
+
+    if (!user) {
       return res.status(200).send({
         message: "User Not Found",
-        success:false,
-      })
+        success: false,
+      });
     }
-    
-    user.password=undefined
-    
 
+    user.password = undefined;
 
-    
-  } catch (error)
-  {
-    console.log(error)
+    res.status(200).json({
+      success: true,
+      user: user,
+    });
+  } catch (error) {
+    console.log(error);
     res.status(500).json({
       message: "auth error",
       success: false,
-      error:error.message
-    })
+      error: error.message,
+    });
   }
-
-}
+};
 
 export const updateUser = async (req, res, next) => {
-  
   try {
-    const { firstName, lastName, location, profileUrl, profession } = req.body
-    
+    const { firstName, lastName, location, profileUrl, profession } = req.body;
+
     if (!(firstName || lastName || profession || location || profileUrl)) {
-      next("please provide all required fields")
-      return
+      next("please provide all required fields");
+      return;
     }
-    const { userId } = req.body.user
+    const { userId } = req.body.user;
     const updateUser = {
       firstName,
       lastName,
       location,
       profileUrl,
       profession,
-      _id:userId
-
-
-    }
+      _id: userId,
+    };
 
     const user = await Users.findByIdAndUpdate(userId, updateUser, {
-      new:true
-    })
+      new: true,
+    });
 
-    await user.populate({ path: "friends", select: "-password" })
-    const token = createJWT(user?._id)
-    
+    await user.populate({ path: "friends", select: "-password" });
+    const token = createJWT(user?._id);
+
     user.password = undefined;
     res.status(200).json({
       success: true,
       message: "user updated successfully",
       user,
-      token
-    })
-
-  }
-
-  catch (error)
-  {
-    console.log(error)
+      token,
+    });
+  } catch (error) {
+    console.log(error);
     res.status(404).json({
-      message:error.message
-    })
-
+      message: error.message,
+    });
   }
-}
-
+};
 
 // for suggested friends
 
 export const suggestedFriends = async (req, res) => {
   try {
-
-    const { userId } = req.body.user
-    let queryObject = {}
-    queryObject._id = { $ne: userId }
+    const { userId } = req.body.user;
+    let queryObject = {};
+    queryObject._id = { $ne: userId };
     queryObject.friends = { $nin: userId };
 
     let queryResult = Users.find(queryObject)
@@ -301,14 +259,11 @@ export const suggestedFriends = async (req, res) => {
       success: true,
       data: suggestedFriends,
     });
-    
-  } catch (error)
-  {
-    console.log(error)
-  res.status(404).json({message:error.message})
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ message: error.message });
   }
-  
-}
+};
 
 export const friendRequest = async (req, res, next) => {
   try {
@@ -344,26 +299,25 @@ export const friendRequest = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: "Friend Request sent successfully",
-      newRes
+      newRes,
     });
   } catch (error) {
     console.log(error);
     res.status(500).json({
       message: "auth error",
       success: false,
-    
+
       error: error.message,
     });
   }
 };
-
 
 // get friend request
 
 export const getFriendRequest = async (req, res) => {
   try {
     const { userId } = req.body.user;
-    console.log("second",userId)
+    console.log("second", userId);
 
     const request = await FriendRequest.find({
       requestTo: userId,
@@ -377,11 +331,10 @@ export const getFriendRequest = async (req, res) => {
       .sort({
         _id: -1,
       });
-    console.log(request)
+    console.log(request);
     res.status(200).json({
       success: true,
       data: request,
-  
     });
   } catch (error) {
     console.log(error);
@@ -392,7 +345,6 @@ export const getFriendRequest = async (req, res) => {
     });
   }
 };
-
 
 // accept  friend_equest
 
@@ -439,5 +391,63 @@ export const acceptRequest = async (req, res, next) => {
       success: false,
       error: error.message,
     });
+  }
+};
+
+export const usersuggestions= async (req, res,next) => {
+  try {
+    const { search } = req.query;
+    const users = await Users.find({ firstName: { $regex: search, $options: 'i' } }, 'firstName');
+    const suggestions = users.map((user) => user.firstName);
+    res.json(suggestions);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
+export const deleteFriendRequest = async (req, res, next) => {
+  try {
+    const { requestId } = req.body;
+    console.log("my check", requestId);
+
+    // Assuming requestId represents the `requestTo` value
+    const deletedRequest = await FriendRequest.findOneAndDelete({ requestTo: requestId });
+
+    if (!deletedRequest) {
+      return res.status(404).json({ success: false, message: 'Friend request not found' });
+    }
+
+    return res.status(200).json({ success: true, message: 'Friend request deleted' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: 'An error occurred' });
+  }
+};
+
+
+export const mutualFriends = async (req, res) => {
+  try {
+    const { user1Id, user2Id } = req.params;
+
+    // Find user1 and user2 by their IDs
+    const user1 = await Users.findById(user1Id).select('friends');
+    const user2 = await Users.findById(user2Id).select('friends');
+
+    // Find mutual friends' IDs
+    const mutualFriendsIds = user1.friends.filter((friendId) =>
+      user2.friends.includes(friendId)
+    );
+
+    // Retrieve the details of mutual friends
+    const mutualFriendsDetails = await Users.find({
+      _id: { $in: mutualFriendsIds },
+    });
+
+    res.json({ mutualFriends: mutualFriendsDetails });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred' });
   }
 };

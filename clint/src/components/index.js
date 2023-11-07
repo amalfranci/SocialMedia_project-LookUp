@@ -7,10 +7,10 @@ import FriendsCard from "./FriendsCard";
 import PostCard from "./PostCard";
 
 import EditProfile from "./EditProfile";
+import EditPost from "./EditPostModal";
 
 
-
-export {TextInput,Loading,CustomButton,TopBar,ProfileCard,FriendsCard,PostCard,EditProfile}
+export {TextInput,Loading,CustomButton,EditPost,TopBar,ProfileCard,FriendsCard,PostCard,EditProfile}
 
 
 

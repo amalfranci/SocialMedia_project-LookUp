@@ -24,6 +24,7 @@ export default function Userlist() {
 
   const getUsers = async () => {
     const res = await getUsersList();
+    console.log("user for admin",res)
     setRows(res.users);
   }
 
