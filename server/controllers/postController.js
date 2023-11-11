@@ -49,7 +49,7 @@ export const getPosts = async (req, res, next) => {
             },
           },
         ],
-        status: { $ne: "blocked" } // Exclude posts with status "blocked"
+        status: { $ne: "blocked" }, // Exclude posts with status "blocked"
       };
     } else {
       searchQuery = { status: { $ne: "blocked" } }; // Exclude posts with status "blocked"
@@ -203,7 +203,7 @@ export const likePost = async (req, res, next) => {
   }
 };
 export const likePostComment = async (req, res, next) => {
-  const { userId } = req.body
+  const { userId } = req.body;
   const { id, rid } = req.params;
 
   try {
@@ -313,23 +313,22 @@ export const replyPostComment = async (req, res, next) => {
   }
 };
 
-
-
-
 export const updatePost = async (req, res) => {
   try {
     const { description, image } = req.body;
     const postId = req.params.id;
 
     if (!description && !image) {
-      return res.status(400).json({ message: 'Please provide data to update the post.' });
+      return res
+        .status(400)
+        .json({ message: "Please provide data to update the post." });
     }
 
     // Check if the post exists
     const existingPost = await Posts.findById(postId);
 
     if (!existingPost) {
-      return res.status(404).json({ message: 'Post not found.' });
+      return res.status(404).json({ message: "Post not found." });
     }
 
     // Update only the fields that are provided in the request
@@ -346,39 +345,40 @@ export const updatePost = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Post updated successfully',
+      message: "Post updated successfully",
       post: updatedPost,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      message: 'An error occurred while updating the post.',
+      message: "An error occurred while updating the post.",
     });
   }
 };
 
-
-
 export const reportPost = async (req, res) => {
   const { postId } = req.params;
+  
 
   try {
     // Find the post by ID
     const post = await Posts.findById(postId);
 
     if (!post) {
-      return res.status(404).json({ message: 'Post not found.' });
+      return res.status(404).json({ message: "Post not found." });
     }
 
     // Update the post's status to 'pending'
-    post.status = 'pending';
+    post.status = "pending";
 
     // Save the updated post
     await post.save();
 
-    res.status(200).json({ message: 'Post reported successfully.' });
+    res.status(200).json({ message: "Post reported successfully." });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'An error occurred while reporting the post.' });
+    res
+      .status(500)
+      .json({ message: "An error occurred while reporting the post." });
   }
 };

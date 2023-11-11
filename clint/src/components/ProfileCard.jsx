@@ -38,15 +38,14 @@ function ProfileCard({ user }) {
             </div>
           </Link>
           <div className="">
-  {user?._id === data?._id ? (
-    <LiaEditSolid
-      size={22}
-      className="text-blue cursor-pointer"
-      onClick={() => dispatch(UpdateProfile(true))}
-    />
-  ) : null}
-</div>
-
+            {user?._id === data?._id ? (
+              <LiaEditSolid
+                size={22}
+                className="text-blue cursor-pointer"
+                onClick={() => dispatch(UpdateProfile(true))}
+              />
+            ) : null}
+          </div>
         </div>
 
         <div className="w-full flex flex-col gap-2 py-4 border-b border-[#66666645]">

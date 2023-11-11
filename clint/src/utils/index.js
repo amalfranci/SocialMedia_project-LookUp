@@ -125,34 +125,25 @@ export const getUserPost = async () => {
   try {
     const posts = await apiRequest({
       url: "/admin/userspost",
-      method:"GET"
-    })
-    return posts
-    
+      method: "GET",
+    });
+    return posts;
+  } catch (error) {
+    console.error(error.message);
   }
-  catch (error)
-  {
-    console.error(error.message)
-  }
-}
+};
 
 export const getReportedPost = async () => {
-  
   try {
     const reportPost = await apiRequest({
       url: "/admin/reportedpost",
-      method:"GET"
-    })
-    return reportPost
-    
+      method: "GET",
+    });
+    return reportPost;
+  } catch (error) {
+    console.error(error.message);
   }
-  catch (error)
-  {
-    console.error(error.message)
-  }
-}
-
-
+};
 
 export const blockUser = async (userId, action) => {
   try {
@@ -182,7 +173,6 @@ export const blockPost = async (postId, action) => {
   }
 };
 
-
 export const sendFriendRequest = async (token, id) => {
   try {
     const res = await apiRequest({
@@ -191,7 +181,7 @@ export const sendFriendRequest = async (token, id) => {
       method: "POST",
       data: { requestTo: id },
     });
-    return res
+    return res;
   } catch (error) {
     const err = error.response.data;
     console.log(err);
@@ -204,7 +194,7 @@ export const usersuggestions = async (token, input) => {
     const res = await apiRequest({
       url: `/users/user-suggestions?search=${input}`,
       method: "GET",
-      token:token
+      token: token,
     });
     return res;
   } catch (error) {

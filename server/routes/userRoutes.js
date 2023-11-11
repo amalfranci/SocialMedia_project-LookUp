@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import {
   acceptRequest,
+  allUsers,
   changePassword,
   deleteFriendRequest,
   friendRequest,
@@ -15,7 +16,11 @@ import {
   usersuggestions,
   verifyEmail,
 } from "../controllers/userController.js";
+
+
 import userAuth from "../middleware/authMiddleware.js";
+import { accessChat, addToGroup, createGroupChat, fetchChats, removeFromGroup, renameGroup } from "../controllers/chatController.js";
+import { allMessages, sendMessage } from "../controllers/messageController.js";
 
 const router = express.Router();
 const __dirname = path.resolve(path.dirname(""));
@@ -46,9 +51,15 @@ router.get("/user-suggestions", usersuggestions);
 // delete friend request
 router.post("/delete-friend-request", userAuth, deleteFriendRequest)
 
+router.get("/all-users", userAuth, allUsers)
+
+
+
 // mutal friend
 
-router.get('/mutual-friends/:user1Id/:user2Id',userAuth,mutualFriends)
+router.get('/mutual-friends/:user1Id/:user2Id', userAuth, mutualFriends)
+
+
 
 router.get("/verified", (req, res) => {
   res.sendFile(path.join(__dirname, "./views/build", "index.html"));
@@ -56,4 +67,18 @@ router.get("/verified", (req, res) => {
 router.get("/resetpassword", (req, res) => {
   res.sendFile(path.join(__dirname, "./views/build", "index.html"));
 });
+
+
+router.post("/access-chat", userAuth, accessChat)
+router.get("/fetch-data", userAuth, fetchChats)
+router.post("/group", userAuth, createGroupChat)
+router.put("/rename-group", userAuth, renameGroup)
+router.put("/groupremove", userAuth, removeFromGroup)
+router.put("/adduser", userAuth, addToGroup)
+
+
+
+router.get("/:chatId", userAuth, allMessages)
+router.post("/sendmessage",userAuth,sendMessage)
+
 export default router;

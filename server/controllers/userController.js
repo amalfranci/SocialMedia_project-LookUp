@@ -5,6 +5,7 @@ import { compareString, createJWT, hashString } from "../utils/index.js";
 import passwordReset from "../models/passwordReset.js";
 import { resetPasswordLink } from "../utils/sendEmail.js";
 import FriendRequest from "../models/friendRequest.js";
+import Chat from "../models/chatModel.js";
 
 export const verifyEmail = async (req, res) => {
   const { userId, token } = req.params;
@@ -394,18 +395,20 @@ export const acceptRequest = async (req, res, next) => {
   }
 };
 
-export const usersuggestions= async (req, res,next) => {
+export const usersuggestions = async (req, res, next) => {
   try {
     const { search } = req.query;
-    const users = await Users.find({ firstName: { $regex: search, $options: 'i' } }, 'firstName');
+    const users = await Users.find(
+      { firstName: { $regex: search, $options: "i" } },
+      "firstName"
+    );
     const suggestions = users.map((user) => user.firstName);
     res.json(suggestions);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: "Server error" });
   }
 };
-
 
 export const deleteFriendRequest = async (req, res, next) => {
   try {
@@ -413,34 +416,38 @@ export const deleteFriendRequest = async (req, res, next) => {
     console.log("my check", requestId);
 
     // Assuming requestId represents the `requestTo` value
-    const deletedRequest = await FriendRequest.findOneAndDelete({ requestTo: requestId });
+    const deletedRequest = await FriendRequest.findOneAndDelete({
+      requestTo: requestId,
+    });
 
     if (!deletedRequest) {
-      return res.status(404).json({ success: false, message: 'Friend request not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Friend request not found" });
     }
 
-    return res.status(200).json({ success: true, message: 'Friend request deleted' });
+    return res
+      .status(200)
+      .json({ success: true, message: "Friend request deleted" });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ success: false, message: 'An error occurred' });
+    return res
+      .status(500)
+      .json({ success: false, message: "An error occurred" });
   }
 };
-
 
 export const mutualFriends = async (req, res) => {
   try {
     const { user1Id, user2Id } = req.params;
 
-    // Find user1 and user2 by their IDs
-    const user1 = await Users.findById(user1Id).select('friends');
-    const user2 = await Users.findById(user2Id).select('friends');
+    const user1 = await Users.findById(user1Id).select("friends");
+    const user2 = await Users.findById(user2Id).select("friends");
 
-    // Find mutual friends' IDs
     const mutualFriendsIds = user1.friends.filter((friendId) =>
       user2.friends.includes(friendId)
     );
 
-    // Retrieve the details of mutual friends
     const mutualFriendsDetails = await Users.find({
       _id: { $in: mutualFriendsIds },
     });
@@ -448,6 +455,41 @@ export const mutualFriends = async (req, res) => {
     res.json({ mutualFriends: mutualFriendsDetails });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'An error occurred' });
+    res.status(500).json({ error: "An error occurred" });
   }
 };
+
+export const allUsers = async (req, res) => {
+  
+  try {
+    const keyword = req.query.search ? {
+      $or: [
+          { firstName: { $regex: req.query.search, $options: "i" } },
+          { email: { $regex: req.query.search, $options: "i" } },
+        ],
+      
+    }
+      : {};
+     const { userId } = req.body.user;
+  
+    const users = await Users.find(keyword).find({ _id: { $ne: userId } });
+     if (!users) {
+      return res
+        .status(404)
+        .json({ success: false, message: "user not found" });
+    }
+
+    
+    return res
+       .send(users)
+      .status(200)
+     
+  }
+  catch (error)
+  {
+    console.error(error)
+  res.status(500).json({ error: "An error occurred" });}
+
+}
+
+

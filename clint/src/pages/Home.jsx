@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux/es/hooks/useSelector";
 import {
   CustomButton,
-
   EditProfile,
   FriendsCard,
   Loading,
@@ -14,13 +13,13 @@ import {
 
 import { Link } from "react-router-dom";
 import { NoProfile } from "../assets";
-import { BsFiletypeGif, BsPersonFillAdd, } from "react-icons/bs";
+import { BsFiletypeGif, BsPersonFillAdd } from "react-icons/bs";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 
 import { BiImages, BiSolidVideo } from "react-icons/bi";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 
 import {
   apiRequest,
@@ -43,9 +42,11 @@ function Home() {
   const [files, setFiles] = useState([]);
   const pendingFriendRequestsStorageKey = "pendingFriendRequests";
 
-  const storedPendingFriendRequests = JSON.parse(localStorage.getItem(pendingFriendRequestsStorageKey)) || {};
-const [pendingFriendRequests, setPendingFriendRequests] = useState(storedPendingFriendRequests);
- 
+  const storedPendingFriendRequests =
+    JSON.parse(localStorage.getItem(pendingFriendRequestsStorageKey)) || {};
+  const [pendingFriendRequests, setPendingFriendRequests] = useState(
+    storedPendingFriendRequests
+  );
 
   const [posting, setPosting] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -56,56 +57,50 @@ const [pendingFriendRequests, setPendingFriendRequests] = useState(storedPending
     handleSubmit,
     formState: { errors },
   } = useForm();
-  
-       
-      
 
   const handlePostSubmit = async (data) => {
-  setPosting(true);
-  setErrMsg("");
+    setPosting(true);
+    setErrMsg("");
 
-  try {
-    const imageUris = [];
-    for (const file of files) {
-      const uri = await handleFileUpload(file);
-      imageUris.push(uri);
-      console.log("my muti", imageUris)
-      
-    }
+    try {
+      const imageUris = [];
+      for (const file of files) {
+        const uri = await handleFileUpload(file);
+        imageUris.push(uri);
+        console.log("my muti", imageUris);
+      }
 
-    const newData = { ...data, images: imageUris };
-  
+      const newData = { ...data, images: imageUris };
 
-    if (imageUris.length === 0 && !newData.description) {
-      setErrMsg("Please upload at least one file or provide a description.");
-      setPosting(false);
-      return;
-    }
+      if (imageUris.length === 0 && !newData.description) {
+        setErrMsg("Please upload at least one file or provide a description.");
+        setPosting(false);
+        return;
+      }
 
-    const res = await apiRequest({
-      url: "/posts/create-post",
-      data: newData,
-      token: user?.token,
-      method: "POST",
-    });
-
-    if (res?.status === "failed") {
-      setErrMsg(res);
-    } else {
-      reset({
-        description: "",
+      const res = await apiRequest({
+        url: "/posts/create-post",
+        data: newData,
+        token: user?.token,
+        method: "POST",
       });
-      setFiles([]);
-      setErrMsg("");
-      await fetchPost();
-    }
-    setPosting(false);
-  } catch (error) {
-    console.log(error);
-    setPosting(false);
-  }
-};
 
+      if (res?.status === "failed") {
+        setErrMsg(res);
+      } else {
+        reset({
+          description: "",
+        });
+        setFiles([]);
+        setErrMsg("");
+        await fetchPost();
+      }
+      setPosting(false);
+    } catch (error) {
+      console.log(error);
+      setPosting(false);
+    }
+  };
 
   const fetchPost = async () => {
     await fetchPosts(user?.token, dispatch);
@@ -117,29 +112,33 @@ const [pendingFriendRequests, setPendingFriendRequests] = useState(storedPending
     await fetchPost();
   };
 
- const handleDelete = async (id) => {
-  // Display a confirmation dialog
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'You won\'t be able to revert this!',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'Cancel',
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      // User confirmed the delete action
-      try {
-        await deletePost(id, user.token);
-        await fetchPost();
-        Swal.fire('Deleted!', 'Your post has been deleted.', 'success');
-      } catch (error) {
-        console.error(error);
-        Swal.fire('Error', 'An error occurred while deleting the post.', 'error');
+  const handleDelete = async (id) => {
+    // Display a confirmation dialog
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        // User confirmed the delete action
+        try {
+          await deletePost(id, user.token);
+          await fetchPost();
+          Swal.fire("Deleted!", "Your post has been deleted.", "success");
+        } catch (error) {
+          console.error(error);
+          Swal.fire(
+            "Error",
+            "An error occurred while deleting the post.",
+            "error"
+          );
+        }
       }
-    }
-  });
-};
+    });
+  };
 
   const fetchSuggestedFriend = async () => {
     try {
@@ -174,9 +173,12 @@ const [pendingFriendRequests, setPendingFriendRequests] = useState(storedPending
         const updatedPendingFriendRequests = { ...pendingFriendRequests };
         updatedPendingFriendRequests[id] = true;
         setPendingFriendRequests(updatedPendingFriendRequests);
-         localStorage.setItem(pendingFriendRequestsStorageKey, JSON.stringify(updatedPendingFriendRequests));
+        localStorage.setItem(
+          pendingFriendRequestsStorageKey,
+          JSON.stringify(updatedPendingFriendRequests)
+        );
       }
-    
+
       await fetchSuggestedFriend();
     } catch (error) {
       console.error(error.message);
@@ -192,44 +194,41 @@ const [pendingFriendRequests, setPendingFriendRequests] = useState(storedPending
         data: { rid: id, status },
       });
       setFriendRequest(res?.data);
-      
     } catch (error) {
       console.log(error);
     }
   };
-  // delete friend request 
+  // delete friend request
   const handleDeleteFriendRequest = async (requestId) => {
-  try {
-    // Send an API request to delete the friend request
-    const res = await apiRequest({
-      url: "/users/delete-friend-request",
-      token: user?.token,
-      method: "POST",
-      data: { requestId },
-    });
+    try {
+      // Send an API request to delete the friend request
+      const res = await apiRequest({
+        url: "/users/delete-friend-request",
+        token: user?.token,
+        method: "POST",
+        data: { requestId },
+      });
 
-    if (res.success) {
-      // Update the local state to remove the friend request
-      const updatedFriendRequests = friendRequest.filter(
-        (request) => request._id !== requestId
-      );
-      setFriendRequest(updatedFriendRequests);
+      if (res.success) {
+        // Update the local state to remove the friend request
+        const updatedFriendRequests = friendRequest.filter(
+          (request) => request._id !== requestId
+        );
+        setFriendRequest(updatedFriendRequests);
 
-      // Update the icon status
-      const updatedPendingFriendRequests = { ...pendingFriendRequests };
-      updatedPendingFriendRequests[requestId] = false;
-      setPendingFriendRequests(updatedPendingFriendRequests);
-      localStorage.setItem(
-        pendingFriendRequestsStorageKey,
-        JSON.stringify(updatedPendingFriendRequests)
-      );
+        // Update the icon status
+        const updatedPendingFriendRequests = { ...pendingFriendRequests };
+        updatedPendingFriendRequests[requestId] = false;
+        setPendingFriendRequests(updatedPendingFriendRequests);
+        localStorage.setItem(
+          pendingFriendRequestsStorageKey,
+          JSON.stringify(updatedPendingFriendRequests)
+        );
+      }
+    } catch (error) {
+      console.error(error.message);
     }
-  } catch (error) {
-    console.error(error.message);
-  }
-};
-
-
+  };
 
   const getUser = async () => {
     const res = await getUserInfo(user?.token);
@@ -296,15 +295,15 @@ const [pendingFriendRequests, setPendingFriendRequests] = useState(storedPending
                   htmlFor="img"
                   className="flex items-center gap-1 text-base text-ascent-2 hover:text-ascent-1 cursor-pointer"
                 >
-                 <input
-  type="file"
-  onChange={(e) => setFiles([...e.target.files])}
-  className="hidden"
-  id="img"
-  data-max-size="5120"
-  accept=".jpg,.png,.jpeg"
-  multiple
-/>
+                  <input
+                    type="file"
+                    onChange={(e) => setFiles([...e.target.files])}
+                    className="hidden"
+                    id="img"
+                    data-max-size="5120"
+                    accept=".jpg,.png,.jpeg"
+                    multiple
+                  />
 
                   <BiImages />
                   <span>Image</span>
@@ -315,7 +314,7 @@ const [pendingFriendRequests, setPendingFriendRequests] = useState(storedPending
                 >
                   <input
                     type="file"
-                     onChange={(e) => setFiles([...e.target.files])}
+                    onChange={(e) => setFiles([...e.target.files])}
                     className="hidden"
                     id="video"
                     data-max-size="5120"
@@ -346,7 +345,7 @@ const [pendingFriendRequests, setPendingFriendRequests] = useState(storedPending
                   key={post?._id}
                   post={post}
                   user={user}
-                 fetchPost={fetchPost}
+                  fetchPost={fetchPost}
                   deletePost={handleDelete}
                   like={handleLikePost}
                 />
@@ -395,11 +394,9 @@ const [pendingFriendRequests, setPendingFriendRequests] = useState(storedPending
                         title="Accept"
                         onclick={() => {
                           acceptFriendRequest(_id, "Accepted");
-                           window.location.reload();
+                          window.location.reload();
                         }}
-                        
                         containerStyles="bg-[#0444a4] text-xs text-white px-1.5 py-1 rounded-full "
-                        
                       />
                       <CustomButton
                         title="Deny"
@@ -444,17 +441,24 @@ const [pendingFriendRequests, setPendingFriendRequests] = useState(storedPending
                         </span>
                       </div>
                     </Link>
-                  <div className="flex gap-1">
-              {pendingFriendRequests[friend._id] ? (
-                <button className="bg-[#0444a430] text-sm text-white p-1 rounded">
-                  <AiOutlineCloseCircle onClick={() => handleDeleteFriendRequest(friend._id)} />
-                </button>
-              ) : (
-                <button className="bg-[#0444a430] text-sm text-white p-1 rounded" onClick={() => handleFriendRequest(friend._id)}>
-                  <BsPersonFillAdd />
-                </button>
-              )}
-            </div>
+                    <div className="flex gap-1">
+                      {pendingFriendRequests[friend._id] ? (
+                        <button className="bg-[#0444a430] text-sm text-white p-1 rounded">
+                          <AiOutlineCloseCircle
+                            onClick={() =>
+                              handleDeleteFriendRequest(friend._id)
+                            }
+                          />
+                        </button>
+                      ) : (
+                        <button
+                          className="bg-[#0444a430] text-sm text-white p-1 rounded"
+                          onClick={() => handleFriendRequest(friend._id)}
+                        >
+                          <BsPersonFillAdd />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -463,7 +467,6 @@ const [pendingFriendRequests, setPendingFriendRequests] = useState(storedPending
         </div>
       </div>
       {edit && <EditProfile />}
-  
     </>
   );
 }

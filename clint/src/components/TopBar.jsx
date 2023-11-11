@@ -65,7 +65,11 @@ function TopBar({ user }) {
           <IoMdNotificationsOutline />
         </div>
         <div>
-          <BsFillChatDotsFill></BsFillChatDotsFill>
+          <Link to="/chats" className="text-ascent-1">
+            <BsFillChatDotsFill
+             user={user}
+            />
+          </Link>
         </div>
         <div className="relative">
           <button

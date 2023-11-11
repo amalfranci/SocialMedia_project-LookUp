@@ -45,8 +45,8 @@ const getPosts = async (req, res) => {
   try {
     const posts = await Posts.find()
       .populate({
-        path: 'userId',
-        select: 'firstName lastName', // Select the fields you need (firstName and lastName)
+        path: "userId",
+        select: "firstName lastName", // Select the fields you need (firstName and lastName)
       })
       .exec();
 
@@ -56,23 +56,22 @@ const getPosts = async (req, res) => {
   }
 };
 
-
 const getUserCount = async (req, res) => {
   try {
     const count = await Users.countDocuments();
     res.json({ count }); // Send the count as JSON response
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: 'An error occurred' }); // Send an error response with a 500 status code
+    res.status(500).json({ error: "An error occurred" }); // Send an error response with a 500 status code
   }
 };
 
-
 const getReportedPosts = async (req, res) => {
   try {
-    const reportedPosts = await Posts.find({ status: 'pending' }).populate({
-        path: 'userId',
-        select: 'firstName lastName', // Select the fields you need (firstName and lastName)
+    const reportedPosts = await Posts.find({ status: "pending" })
+      .populate({
+        path: "userId",
+        select: "firstName lastName", // Select the fields you need (firstName and lastName)
       })
       .exec();
     res.status(200).json({ success: true, data: reportedPosts });
@@ -80,39 +79,28 @@ const getReportedPosts = async (req, res) => {
     console.error(err.message);
     res.status(500).json({ success: false, error: err.message });
   }
-}
-
+};
 
 const blockPost = async (req, res) => {
   const { postId } = req.params;
   const { action } = req.body;
   try {
-    const post = await Posts.findById(postId)
-    if (!post)
-    {
-      return res.status(404).json({ message: "post not found" })
-      
+    const post = await Posts.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: "post not found" });
     }
     if (action === "block") {
-      post.status="blocked"
+      post.status = "blocked";
+    } else if (action === "active") {
+      post.status = "active";
     }
-    else if (action === "active") {
-      post.status="active"
-    }
-    await post.save()
-     res.status(200).json({ message: `Post ${action}ed successfully`, post });
-    
-    
-  }
-  catch (error)
-  {
+    await post.save();
+    res.status(200).json({ message: `Post ${action}ed successfully`, post });
+  } catch (error) {
     console.error(error.message);
-      res.status(500).json({ error: "Internal server error" });
-
+    res.status(500).json({ error: "Internal server error" });
   }
-
-}
-
+};
 
 // block user
 
@@ -122,8 +110,6 @@ const blockUser = async (req, res) => {
 
   try {
     const user = await Users.findById(userId);
-
-  
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -144,4 +130,12 @@ const blockUser = async (req, res) => {
   }
 };
 
-export { adminLogin, getUsers, blockUser,getPosts,blockPost,getReportedPosts ,getUserCount};
+export {
+  adminLogin,
+  getUsers,
+  blockUser,
+  getPosts,
+  blockPost,
+  getReportedPosts,
+  getUserCount,
+};

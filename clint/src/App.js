@@ -4,16 +4,31 @@ import Adminlogin from "./components/adminpage/AdminLogin";
 import { AdminHome } from "./components/adminpage/AdminHome";
 import { useSelector } from "react-redux/es/hooks/useSelector";
 import PostList from "./components/admin_help_page/PostList";
+import Chat from "./pages/Chat";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { ChakraProvider } from '@chakra-ui/react'
+
+
+
 
 import UserPage from "./components/admin_help_page/UserPage";
 import ComplaintToken from "./components/admin_help_page/ComplaintToken";
+import ChatProvider from "./components/Context/ChatProvider";
 
 function Layout() {
   const { user } = useSelector((state) => state.user);
   const loaction = useLocation();
 
-  return user?.token ? (
-    <Outlet />
+  return user?.token ? (<>
+   <ChatProvider>
+    <ChakraProvider>
+    <ToastContainer/>
+      <Outlet />
+      </ChakraProvider>
+      </ChatProvider>
+    </>
+
   ) : (
     <Navigate to="/login" state={{ from: loaction }} replace />
   );
@@ -36,24 +51,31 @@ function App() {
 
   return (
     <div data-theme={theme} className="w-full min-h-[100vh]">
-      <Routes>
+
+      <Routes> 
         <Route element={<Layout />}>
+        
           <Route path="/" element={<Home />} />
           <Route path="/profile/:id?" element={<Profile />} />
+          <Route path="/chats" element={<Chat/>}/>
+          
         </Route>
+         
 
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
         <Route path="/adminlogin" element={<Adminlogin />} />
+       
 
         {/* admin route */}
         <Route element={<Adminlayout />}>
           <Route path="/adminHome" element={<AdminHome />} />
           <Route path="/userlist" element={<UserPage />} />
           <Route path="/token" element={<ComplaintToken />} />
-          <Route path="/posts" element={<PostList/>}/>
+          <Route path="/posts" element={<PostList />} />
+          
         </Route>
       </Routes>
     </div>

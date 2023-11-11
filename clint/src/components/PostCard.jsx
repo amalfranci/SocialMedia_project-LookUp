@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { NoProfile } from "../assets";
 import { Link } from "react-router-dom";
 import moment from "moment";
-import { BiComment, BiLike, BiSolidLike,BiSolidReport } from "react-icons/bi";
+import { BiComment, BiLike, BiSolidLike, BiSolidReport } from "react-icons/bi";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 import { useForm } from "react-hook-form";
@@ -12,59 +12,55 @@ import CustomButton from "./CustomButton";
 import { UpdatePost } from "../redux/postSlice";
 import { useDispatch, useSelector } from "react-redux";
 import EditPostModal from "./EditPostModal";
-import Swal from 'sweetalert2';
-import 'sweetalert2/dist/sweetalert2.min.css';
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 import { apiRequest } from "../utils";
 
 const getPostComments = async (id) => {
   try {
     const res = await apiRequest({
       url: "/posts/comments/" + id,
-      method:"GET"
-    })
-    return res?.data
-    
-  } catch (error)
-  {
-    console.log(error)
+      method: "GET",
+    });
+    return res?.data;
+  } catch (error) {
+    console.log(error);
   }
-}
-
-
+};
 
 const ReplyCard = ({ reply, user, handleLike }) => {
   return (
-    <div className='w-full py-3'>
-      <div className='flex gap-3 items-center mb-1'>
+    <div className="w-full py-3">
+      <div className="flex gap-3 items-center mb-1">
         <Link to={"/profile/" + reply?.userId?._id}>
           <img
             src={reply?.userId?.profileUrl ?? NoProfile}
             alt={reply?.userId?.firstName}
-            className='w-10 h-10 rounded-full object-cover'
+            className="w-10 h-10 rounded-full object-cover"
           />
         </Link>
 
         <div>
           <Link to={"/profile/" + reply?.userId?._id}>
-            <p className='font-medium text-base text-ascent-1'>
+            <p className="font-medium text-base text-ascent-1">
               {reply?.userId?.firstName} {reply?.userId?.lastName}
             </p>
           </Link>
-          <span className='text-ascent-2 text-sm'>
+          <span className="text-ascent-2 text-sm">
             {moment(reply?.createdAt).fromNow()}
           </span>
         </div>
       </div>
 
-      <div className='ml-12'>
-        <p className='text-ascent-2 '>{reply?.comment}</p>
-        <div className='mt-2 flex gap-6'>
+      <div className="ml-12">
+        <p className="text-ascent-2 ">{reply?.comment}</p>
+        <div className="mt-2 flex gap-6">
           <p
-            className='flex gap-2 items-center text-base text-ascent-2 cursor-pointer'
+            className="flex gap-2 items-center text-base text-ascent-2 cursor-pointer"
             onClick={handleLike}
           >
             {reply?.likes?.includes(user?._id) ? (
-              <BiSolidLike size={20} color='blue' />
+              <BiSolidLike size={20} color="blue" />
             ) : (
               <BiLike size={20} />
             )}
@@ -75,8 +71,6 @@ const ReplyCard = ({ reply, user, handleLike }) => {
     </div>
   );
 };
-
-
 
 const CommentForm = ({ user, id, replyAt, getComments }) => {
   const [loading, setLoading] = useState(false);
@@ -90,39 +84,35 @@ const CommentForm = ({ user, id, replyAt, getComments }) => {
     mode: "onChange",
   });
   const onSubmit = async (data) => {
-    setLoading(true)
-    setErrMsg("")
+    setLoading(true);
+    setErrMsg("");
     try {
-      const URL = !replyAt 
+      const URL = !replyAt
         ? "/posts/comment/" + id
-        : "/posts/reply-comment/" + id     
+        : "/posts/reply-comment/" + id;
       const newData = {
         comment: data?.comment,
         from: user?.firstName + " " + user.lastName,
-        replyAt:replyAt
-      }
+        replyAt: replyAt,
+      };
       const res = apiRequest({
         url: URL,
         data: newData,
         token: user?.token,
-        method:"POST"
-      })
-      if (res?.status === "failed")
-      {
-        setErrMsg(res)
-      }
-      else {
+        method: "POST",
+      });
+      if (res?.status === "failed") {
+        setErrMsg(res);
+      } else {
         reset({
-          comment:"",
-        })
-        setErrMsg("")
-        await getComments()
+          comment: "",
+        });
+        setErrMsg("");
+        await getComments();
       }
-      setLoading(false)
-      
-    } catch (error)
-    {
-      console.log(error)
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -174,12 +164,10 @@ const CommentForm = ({ user, id, replyAt, getComments }) => {
   );
 };
 
-function PostCard({ post, user, deletePost,fetchPost, like }) {
-   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+function PostCard({ post, user, deletePost, fetchPost, like }) {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [reporting, setReporting] = useState(false);
-const [reported, setReported] = useState(post?.status === 'pending');
-
-  
+  const [reported, setReported] = useState(post?.status === "pending");
 
   const openEditModal = () => {
     setIsEditModalOpen(true);
@@ -188,25 +176,26 @@ const [reported, setReported] = useState(post?.status === 'pending');
   const closeEditModal = () => {
     setIsEditModalOpen(false);
   };
-  
 
   const [showall, setShowAll] = useState(0);
   const [showReply, setShowReply] = useState(0);
-   const [comments, setComments] = useState([]);
+  const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [replyComments, setReplyComments] = useState(0);
   const [showComments, setShowComments] = useState(0);
-  const hasOneImage = post?.image && Array.isArray(post.image) && post.image.length === 1;
-  const hasMultiImage = post?.image && Array.isArray(post.image) && post.image.length > 1;
+  const hasOneImage =
+    post?.image && Array.isArray(post.image) && post.image.length === 1;
+  const hasMultiImage =
+    post?.image && Array.isArray(post.image) && post.image.length > 1;
 
   // for post comment
-  const dispatch = useDispatch()
-  
+  const dispatch = useDispatch();
+
   const getComments = async (id) => {
-    setReplyComments(0)
-    const result = await getPostComments(id)
-    setComments(result)
-    setLoading(false)
+    setReplyComments(0);
+    const result = await getPostComments(id);
+    setComments(result);
+    setLoading(false);
   };
 
   // for post like
@@ -216,45 +205,45 @@ const [reported, setReported] = useState(post?.status === 'pending');
   };
   const handleReport = async () => {
     if (reported) {
-   
       return;
     }
-  const result = await Swal.fire({
-    title: 'Report Post',
-    text: 'Are you sure you want to report this post?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, report it',
-    cancelButtonText: 'No, cancel',
-  });
+    const result = await Swal.fire({
+      title: "Report Post",
+      text: "Are you sure you want to report this post?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, report it",
+      cancelButtonText: "No, cancel",
+    });
 
-  if (result.isConfirmed) {
-    // User confirmed the report, proceed with reporting
-    try {
-      const response = await fetch(`http://localhost:8800/posts/reportPost/${post._id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: "pending" }),
-      });
+    if (result.isConfirmed) {
+      // User confirmed the report, proceed with reporting
+      try {
+        const response = await fetch(
+          `http://localhost:8800/posts/reportPost/${post._id}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ status: "pending" }),
+          }
+        );
 
-      if (response.ok) {
-        // The report was successful, update the UI or take appropriate action
-        console.log("Post reported successfully.");
-        setReported(true)
-        // You can also update the UI to reflect the reported status if needed
-      } else {
-        // Handle/report the error
-        console.error("Report failed.");
+        if (response.ok) {
+          // The report was successful, update the UI or take appropriate action
+          console.log("Post reported successfully.");
+          setReported(true);
+          // You can also update the UI to reflect the reported status if needed
+        } else {
+          // Handle/report the error
+          console.error("Report failed.");
+        }
+      } catch (error) {
+        console.error("An error occurred while reporting:", error);
       }
-    } catch (error) {
-      console.error("An error occurred while reporting:", error);
     }
-
- 
-  }
-};
+  };
 
   return (
     <div className="mb-2 bg-primary p-4 rounded-xl">
@@ -329,7 +318,7 @@ const [reported, setReported] = useState(post?.status === 'pending');
             ))}
           </div>
         )}
-        {hasOneImage && (
+        {hasOneImage &&
           post.image.map((url, index) => (
             <div key={index} className="w-full">
               {url.toLowerCase().endsWith(".mp4") ? (
@@ -352,8 +341,7 @@ const [reported, setReported] = useState(post?.status === 'pending');
                 />
               )}
             </div>
-          ))
-        )}
+          ))}
       </div>
       <div className="mt-4 flex justify-between items-center px-3 py-2 text-ascent text-base border-t border-[#66666645]">
         <p
@@ -377,35 +365,31 @@ const [reported, setReported] = useState(post?.status === 'pending');
           <BiComment size={20} />
           {post?.comments?.length} Comments
         </p>
-   <p>
-  {user?._id === post?.userId?._id ? (
-    <div className="flex gap-1 items-center text-base text-ascent-1 cursor-pointer">
-      <FaEdit size={20} onClick={openEditModal} />
-      <span>Edit</span>
-    </div>
-  ) : (
-   <div className="flex gap-1 items-center text-base text-ascent-1 cursor-pointer">
-  {reported ? (
-    // Show "Reported" if the post has been reported
-    <span>Reported</span>
-  ) : (
-    // Show "Report" if the post has not been reported
-    <BiSolidReport size={20} onClick={handleReport} />
-    
-    
-  )}
-</div>
-
-  )}
-  {isEditModalOpen && (
-    <EditPostModal
-      post={post} // Pass the post data to the EditPostModal
-      onClose={closeEditModal}
-      fetchPost={fetchPost}        // Pass a callback to close the modal
-    />
-  )}
-</p>
-
+        <p>
+          {user?._id === post?.userId?._id ? (
+            <div className="flex gap-1 items-center text-base text-ascent-1 cursor-pointer">
+              <FaEdit size={20} onClick={openEditModal} />
+              <span>Edit</span>
+            </div>
+          ) : (
+            <div className="flex gap-1 items-center text-base text-ascent-1 cursor-pointer">
+              {reported ? (
+                // Show "Reported" if the post has been reported
+                <span>Reported</span>
+              ) : (
+                // Show "Report" if the post has not been reported
+                <BiSolidReport size={20} onClick={handleReport} />
+              )}
+            </div>
+          )}
+          {isEditModalOpen && (
+            <EditPostModal
+              post={post} // Pass the post data to the EditPostModal
+              onClose={closeEditModal}
+              fetchPost={fetchPost} // Pass a callback to close the modal
+            />
+          )}
+        </p>
 
         {user?._id === post?.userId?._id && (
           <div
@@ -419,8 +403,8 @@ const [reported, setReported] = useState(post?.status === 'pending');
       </div>
 
       {/* comments */}
-     {showComments === post?._id && (
-        <div className='w-full mt-4 border-t border-[#66666645] pt-4 '>
+      {showComments === post?._id && (
+        <div className="w-full mt-4 border-t border-[#66666645] pt-4 ">
           <CommentForm
             user={user}
             id={post?._id}
@@ -431,41 +415,46 @@ const [reported, setReported] = useState(post?.status === 'pending');
             <Loading />
           ) : comments?.length > 0 ? (
             comments?.map((comment) => (
-              <div className='w-full py-2' key={comment?._id}>
-                <div className='flex gap-3 items-center mb-1'>
+              <div className="w-full py-2" key={comment?._id}>
+                <div className="flex gap-3 items-center mb-1">
                   <Link to={"/profile/" + comment?.userId?._id}>
                     <img
                       src={comment?.userId?.profileUrl ?? NoProfile}
                       alt={comment?.userId?.firstName}
-                      className='w-10 h-10 rounded-full object-cover'
+                      className="w-10 h-10 rounded-full object-cover"
                     />
                   </Link>
                   <div>
                     <Link to={"/profile/" + comment?.userId?._id}>
-                      <p className='font-medium text-base text-ascent-1'>
+                      <p className="font-medium text-base text-ascent-1">
                         {comment?.userId?.firstName} {comment?.userId?.lastName}
                       </p>
                     </Link>
-                    <span className='text-ascent-2 text-sm'>
+                    <span className="text-ascent-2 text-sm">
                       {moment(comment?.createdAt ?? "2023-05-25").fromNow()}
                     </span>
                   </div>
                 </div>
 
-                <div className='ml-12'>
-                  <p className='text-ascent-2'>{comment?.comment}</p>
+                <div className="ml-12">
+                  <p className="text-ascent-2">{comment?.comment}</p>
 
-                  <div className='mt-2 flex gap-6'>
-                    <p className='flex gap-2 items-center text-base text-ascent-2 cursor-pointer ' onClick={()=>{handleLike("/posts/like-comment/" + comment?._id)}}>
+                  <div className="mt-2 flex gap-6">
+                    <p
+                      className="flex gap-2 items-center text-base text-ascent-2 cursor-pointer "
+                      onClick={() => {
+                        handleLike("/posts/like-comment/" + comment?._id);
+                      }}
+                    >
                       {comment?.likes?.includes(user?._id) ? (
-                        <BiSolidLike size={20} color='blue' />
+                        <BiSolidLike size={20} color="blue" />
                       ) : (
                         <BiLike size={20} />
                       )}
                       {comment?.likes?.length} Likes
                     </p>
                     <span
-                      className='text-blue cursor-pointer'
+                      className="text-blue cursor-pointer"
                       onClick={() => setReplyComments(comment?._id)}
                     >
                       Reply
@@ -484,10 +473,10 @@ const [reported, setReported] = useState(post?.status === 'pending');
 
                 {/* REPLIES */}
 
-                <div className='py-2 px-8 mt-6'>
+                <div className="py-2 px-8 mt-6">
                   {comment?.replies?.length > 0 && (
                     <p
-                      className='text-base text-ascent-1 cursor-pointer'
+                      className="text-base text-ascent-1 cursor-pointer"
                       onClick={() =>
                         setShowReply(
                           showReply === comment?.replies?._id
@@ -506,7 +495,13 @@ const [reported, setReported] = useState(post?.status === 'pending');
                         reply={reply}
                         user={user}
                         key={reply?._id}
-                        handleLike={() =>handleLike("/posts/like-comment/" + comment?._id +"/" +reply?._id)
+                        handleLike={() =>
+                          handleLike(
+                            "/posts/like-comment/" +
+                              comment?._id +
+                              "/" +
+                              reply?._id
+                          )
                         }
                       />
                     ))}
@@ -514,7 +509,7 @@ const [reported, setReported] = useState(post?.status === 'pending');
               </div>
             ))
           ) : (
-            <span className='flex text-sm py-4 text-ascent-2 text-center'>
+            <span className="flex text-sm py-4 text-ascent-2 text-center">
               No Comments, be first to comment
             </span>
           )}

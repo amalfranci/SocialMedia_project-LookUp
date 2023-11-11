@@ -1,25 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
-import { MdClose } from 'react-icons/md';
-import Loading from './Loading';
-import CustomButton from './CustomButton';
-import TextInput from './TextInput';
-import { UpdatePost } from '../redux/postSlice';
-import { apiRequest, handleFileUpload } from '../utils';
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import { MdClose } from "react-icons/md";
+import Loading from "./Loading";
+import CustomButton from "./CustomButton";
+import TextInput from "./TextInput";
+import { UpdatePost } from "../redux/postSlice";
+import { apiRequest, handleFileUpload } from "../utils";
 
-
-function EditPostModal({ post,fetchPost,onClose }) {
- // Assuming you only need the user from the store
+function EditPostModal({ post, fetchPost, onClose }) {
+  // Assuming you only need the user from the store
   const dispatch = useDispatch();
-  const [errMsg, setErrMsg] = useState('');
+  const [errMsg, setErrMsg] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [file, setFile] = useState([]);
-   useEffect(() => {
-   
-     fetchPost();
-    
-   
+  useEffect(() => {
+    fetchPost();
   }, []);
 
   const {
@@ -27,43 +23,41 @@ function EditPostModal({ post,fetchPost,onClose }) {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    mode: 'onChange',
+    mode: "onChange",
     defaultValues: { description: post.description }, // Pass the current description from the 'post' prop
   });
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
-    setErrMsg('');
+    setErrMsg("");
     try {
       const uri = file.length > 0 && (await handleFileUpload(file[0]));
       const { description } = data;
       const res = await apiRequest({
-        url: '/posts/update-post/' + post._id, // Use the post's ID from the 'post' prop
+        url: "/posts/update-post/" + post._id, // Use the post's ID from the 'post' prop
         data: {
           description,
           image: uri ? uri : post.image,
         },
-        method: 'PUT',
-       
+        method: "PUT",
       });
-      if (res?.status === 'failed') {
+      if (res?.status === "failed") {
         setErrMsg(res);
       } else {
         setErrMsg(res);
-         // Delay the page refresh for 2 seconds (2000 milliseconds)
-        await fetchPost()
-        onClose()
-        
+        // Delay the page refresh for 2 seconds (2000 milliseconds)
+        await fetchPost();
+        onClose();
       }
       setIsSubmitting(false);
     } catch (error) {
       console.log(error);
       setIsSubmitting(false);
     }
-  }
+  };
 
   const handleClose = () => {
-    dispatch(onClose(true))
+    dispatch(onClose(true));
   };
 
   const handleSelect = (e) => {
@@ -106,10 +100,13 @@ function EditPostModal({ post,fetchPost,onClose }) {
                 label="Description"
                 type="text"
                 styles="w-full rounded-full py-5"
-                register={register('description', {
-                  required: file.length === 0 ? 'Write something about the post' : false,
+                register={register("description", {
+                  required:
+                    file.length === 0
+                      ? "Write something about the post"
+                      : false,
                 })}
-                error={errors.description ? errors.description.message : ''}
+                error={errors.description ? errors.description.message : ""}
               />
               <label
                 className="flex items-center gap-1 text-base text-ascent-2 hover:text-ascent-1 cursor-pointer my-4"
@@ -127,12 +124,12 @@ function EditPostModal({ post,fetchPost,onClose }) {
               {errMsg?.message && (
                 <span
                   className={`text-sm ${
-                    errMsg?.status === 'failed'
-                      ? 'text-[#f64949fe]'
-                      : 'text-[#2ba150fe]'
+                    errMsg?.status === "failed"
+                      ? "text-[#f64949fe]"
+                      : "text-[#2ba150fe]"
                   } mt-0.5`}
                 >
-                  {errMsg?.message}{' '}
+                  {errMsg?.message}{" "}
                 </span>
               )}
               <div className="py-5 sm:flex sm:flex-row-reverse border-t border-[#66666645]">
