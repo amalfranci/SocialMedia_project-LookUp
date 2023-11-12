@@ -1,132 +1,113 @@
-import Posts from "../models/postModel.js"
+import Posts from "../models/postModel.js";
 import Users from "../models/userModel.js";
-import Comments from "../models/commentModel.js"
+import Comments from "../models/commentModel.js";
 
+export const createPost = async (req, res, next) => {
+  try {
+    const { userId } = req.body.user;
+    const { description, images } = req.body; // Updated to accept an array of images
 
+    const post = await Posts.create({
+      userId,
+      description,
+      image: images, // Save the array of image URIs in the "image" field
+    });
 
-export const createPost = async (req, res, next) =>
-{
-    try {
-
-        const { userId } = req.body.user;
-        const { description, image,} = req.body;
-        // if (!description)
-        // {
-        //     next('you must provide a description');
-        //     return
-
-        // }
-        const post = await Posts.create({
-            userId,
-            description,
-          image,
-       
-            
-            
-            
-        })
-        res.status(200).json({
-            success: true,
-            message: "post created successfull",
-            data:post
-        })
-        
-    }
-    catch (error)
-    {
-        console.log(error)
-        res.status(404).json({message:error.message})
-    }
-}
-
-
-export const getPosts = async (req, res, next) => {
-    try {
-        const { userId } = req.body.user;
-        const { search } = req.body;
-
-        const user = await Users.findById(userId);
-        const friends = user?.friends?.toString().split(",") ?? [];
-        friends.push(userId);
-
-        let searchQuery;
-
-        if (search) {
-            searchQuery = {
-                $or: [
-                    {
-                        description: { $regex: search, $options: "i" }
-                    },
-                    {
-                        userId: {
-                            $in: await Users.find({
-                                firstName: { $regex: search, $options: "i" }
-                            }).distinct("_id")
-                        }
-                    }
-                ]
-            };
-        } else {
-            searchQuery = {}; // Empty query to fetch all posts when there's no search
-        }
-
-        const posts = await Posts.find(searchQuery).populate({
-            path: "userId",
-            select: "firstName lastName location profileUrl -password",
-        }).sort({ _id: -1 });
-
-        const friendsPosts = posts?.filter((post) => {
-            return friends.includes(post?.userId?._id.toString())
-        });
-
-        const otherPosts = posts?.filter((post) => !friends.includes(post?.userId?._id.toString()));
-
-        let postsRes = null;
-
-        if (friendsPosts?.length > 0) {
-            postsRes = search ? friendsPosts : [...friendsPosts, ...otherPosts];
-        } else {
-            postsRes = posts;
-        }
-
-        res.status(200).json({
-            success: true,
-            message: "successfully",
-            data: postsRes,
-        });
-
-    } catch (error) {
-        console.log(error);
-        res.status(404).json({ message: error.message });
-    }
+    res.status(200).json({
+      success: true,
+      message: "Post created successfully",
+      data: post,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
 };
 
+export const getPosts = async (req, res, next) => {
+  try {
+    const { userId } = req.body.user;
+    const { search } = req.body;
+
+    const user = await Users.findById(userId);
+    const friends = user?.friends?.toString().split(",") ?? [];
+    friends.push(userId);
+
+    let searchQuery;
+
+    if (search) {
+      searchQuery = {
+        $or: [
+          {
+            description: { $regex: search, $options: "i" },
+          },
+          {
+            userId: {
+              $in: await Users.find({
+                firstName: { $regex: search, $options: "i" },
+              }).distinct("_id"),
+            },
+          },
+        ],
+        status: { $ne: "blocked" }, // Exclude posts with status "blocked"
+      };
+    } else {
+      searchQuery = { status: { $ne: "blocked" } }; // Exclude posts with status "blocked"
+    }
+
+    const posts = await Posts.find(searchQuery)
+      .populate({
+        path: "userId",
+        select: "firstName lastName location profileUrl -password",
+      })
+      .sort({ _id: -1 });
+
+    const friendsPosts = posts?.filter((post) => {
+      return friends.includes(post?.userId?._id.toString());
+    });
+
+    const otherPosts = posts?.filter(
+      (post) => !friends.includes(post?.userId?._id.toString())
+    );
+
+    let postsRes = null;
+
+    if (friendsPosts?.length > 0) {
+      postsRes = search ? friendsPosts : [...friendsPosts, ...otherPosts];
+    } else {
+      postsRes = posts;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "successfully",
+      data: postsRes,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ message: error.message });
+  }
+};
 
 export const getPost = async (req, res, next) => {
-    
-    try {
-        const { id } = req.params;
-        const post = await Posts.findById(id).populate({
-            path: "userId",
-            select:"firstName lastName location profileUrl -password",
-        })
-        res.status(200).json({
-            success: true,
-            message: "successfully",
-            data:post,
-        })
-        
-    }
-    catch (error)
-    {
-        console.log(error)
-        res.status(404).json({
-            message:error.message
-
-        })
-    }
-}
-
+  try {
+    const { id } = req.params;
+    const post = await Posts.findById(id).populate({
+      path: "userId",
+      select: "firstName lastName location profileUrl -password",
+    });
+    res.status(200).json({
+      success: true,
+      message: "successfully",
+      data: post,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      message: error.message,
+    });
+  }
+};
 
 export const getUserPost = async (req, res, next) => {
   try {
@@ -166,10 +147,8 @@ export const deletePost = async (req, res, next) => {
   }
 };
 
-
 export const getComments = async (req, res, next) => {
-  
- try {
+  try {
     const { postId } = req.params;
 
     const postComments = await Comments.find({ postId })
@@ -192,7 +171,7 @@ export const getComments = async (req, res, next) => {
     console.log(error);
     res.status(404).json({ message: error.message });
   }
-}
+};
 
 export const likePost = async (req, res, next) => {
   try {
@@ -224,7 +203,7 @@ export const likePost = async (req, res, next) => {
   }
 };
 export const likePostComment = async (req, res, next) => {
-  const { userId } = req.body.user;
+  const { userId } = req.body;
   const { id, rid } = req.params;
 
   try {
@@ -287,71 +266,119 @@ export const likePostComment = async (req, res, next) => {
 };
 
 export const commentPost = async (req, res, next) => {
-
   try {
-    const { comment, from } = req.body
-    const { userId } = req.body.user
-    const { id } = req.params
-    
-    if (comment === null)
-    {
-      res.status(404).json({message:"Comment is required "})
+    const { comment, from } = req.body;
+    const { userId } = req.body.user;
+    const { id } = req.params;
 
+    if (comment === null) {
+      res.status(404).json({ message: "Comment is required " });
     }
-    const newComment = new Comments({ comment, from, userId, postId: id })
-    await newComment.save()
-    const post = await Posts.findById(id)
-    post.comments.push(newComment._id)
+    const newComment = new Comments({ comment, from, userId, postId: id });
+    await newComment.save();
+    const post = await Posts.findById(id);
+    post.comments.push(newComment._id);
     const updatedPost = await Posts.findByIdAndUpdate(id, post, {
       new: true,
-      
-    })
-    res.status(201).json({newComment})
-
-    
+    });
+    res.status(201).json({ newComment });
+  } catch (error) {
+    console.log(error);
   }
-  catch (error)
-  {
-    console.log(error)
-  }
-  
-
-}
+};
 
 export const replyPostComment = async (req, res, next) => {
-  
-  const { userId } = req.body.user
-  const { comment, replyAt, from } = req.body
-  const { id } = req.params
+  const { userId } = req.body.user;
+  const { comment, replyAt, from } = req.body;
+  const { id } = req.params;
 
-  if (comment === null)
-  {
-   return res.status(404).json({ message: "comment is required" })
-    
+  if (comment === null) {
+    return res.status(404).json({ message: "comment is required" });
   }
   try {
-    const commentInfo = await Comments.findById(id)
+    const commentInfo = await Comments.findById(id);
     commentInfo.replies.push({
       comment,
       replyAt,
       from,
       userId,
-      created_At:Date.now()
+      created_At: Date.now(),
+    });
+    commentInfo.save();
 
-    })
-    commentInfo.save()
-
-    res.status(200).json(commentInfo)
-    
+    res.status(200).json(commentInfo);
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({ message: error.message });
   }
-  catch (error)
-  {
-    console.log(error)
-    res.status(404).json({message:error.message})
+};
 
+export const updatePost = async (req, res) => {
+  try {
+    const { description, image } = req.body;
+    const postId = req.params.id;
+
+    if (!description && !image) {
+      return res
+        .status(400)
+        .json({ message: "Please provide data to update the post." });
+    }
+
+    // Check if the post exists
+    const existingPost = await Posts.findById(postId);
+
+    if (!existingPost) {
+      return res.status(404).json({ message: "Post not found." });
+    }
+
+    // Update only the fields that are provided in the request
+    if (description) {
+      existingPost.description = description;
+    }
+
+    if (image) {
+      existingPost.image = image;
+    }
+
+    // Save the updated post
+    const updatedPost = await existingPost.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Post updated successfully",
+      post: updatedPost,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: "An error occurred while updating the post.",
+    });
   }
+};
+
+export const reportPost = async (req, res) => {
+  const { postId } = req.params;
   
 
-  
+  try {
+    // Find the post by ID
+    const post = await Posts.findById(postId);
 
-}
+    if (!post) {
+      return res.status(404).json({ message: "Post not found." });
+    }
+
+    // Update the post's status to 'pending'
+    post.status = "pending";
+
+    // Save the updated post
+    await post.save();
+
+    res.status(200).json({ message: "Post reported successfully." });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while reporting the post." });
+  }
+};

@@ -148,7 +148,31 @@ export default function Sidenav() {
                 <ListItemText primary="Userlist" sx={{ opacity: open ? 1 : 0 }} />
               </ListItemButton>
                   </ListItem>
+
+          
+<ListItem  disablePadding sx={{ display: 'block' }} onClick={()=>{navigate("/posts")}} >
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? 'initial' : 'center',
+                px: 2.5,
                   
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 3 : 'auto',
+                    justifyContent: 'center',
+                  }}
+                >
+                 <InboxIcon />
+                </ListItemIcon>
+                <ListItemText primary="Postlist" sx={{ opacity: open ? 1 : 0 }} />
+              </ListItemButton>
+            </ListItem>
+
+{/*                   
                     <ListItem  disablePadding sx={{ display: 'block' }} onClick={()=>{navigate("/token")}} >
               <ListItemButton
                 sx={{
@@ -169,7 +193,7 @@ export default function Sidenav() {
                 </ListItemIcon>
                 <ListItemText primary="Token" sx={{ opacity: open ? 1 : 0 }} />
               </ListItemButton>
-            </ListItem>
+            </ListItem> */}
       
         </List>
        

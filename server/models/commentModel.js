@@ -5,7 +5,7 @@ const commentSchema = new mongoose.Schema({
     userId: { type: Schema.Types.ObjectId, ref: "Users" },
     postId: { type: Schema.Types.ObjectId, ref: "Post" },
     comment: { type: String, required: true },
-    form: { type: String, required: true },
+    from: { type: String, required: true },
     replies: [
         {
             rid: { type: mongoose.Schema.Types.ObjectId },
