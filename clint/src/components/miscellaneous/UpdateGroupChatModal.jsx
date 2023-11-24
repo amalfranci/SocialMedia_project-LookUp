@@ -22,7 +22,6 @@ import { ChatState } from "../Context/ChatProvider";
 import UserBadgeItem from "../userAvatar/UserBadgeItem";
 import UserListItem from "../userAvatar/UserListItem";
 
-
 const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [groupChatName, setGroupChatName] = useState();
@@ -47,8 +46,11 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-   const { data } = await axios.get(`http://localhost:8800/users/all-users?search=${search}`,config);
-      console.log(data);
+      const { data } = await axios.get(
+        `http://localhost:8800/users/all-users?search=${search}`,
+        config
+      );
+    
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
@@ -83,7 +85,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
         config
       );
 
-      console.log(data._id);
+
       // setSelectedChat("");
       setSelectedChat(data);
       setFetchAgain(!fetchAgain);
@@ -159,8 +161,8 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
   };
 
   const handleRemove = async (user1) => {
-      if (selectedChat.groupAdmin._id !== user._id && user1._id !== user._id) {
-        console.log("sadsadadsadsad",user._id)
+    if (selectedChat.groupAdmin._id !== user._id && user1._id !== user._id) {
+     
       toast({
         title: "Only admins can remove someone!",
         status: "error",
@@ -185,19 +187,16 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
           userId: user1._id,
         },
         config
-        );
-        
-     
+      );
 
       user1._id === user._id ? setSelectedChat() : setSelectedChat(data);
       setFetchAgain(!fetchAgain);
       fetchMessages();
-        setLoading(false);
-  
+      setLoading(false);
     } catch (error) {
       toast({
         title: "removed sucessfully",
-       
+
         status: "success",
         duration: 5000,
         isClosable: true,
@@ -210,7 +209,11 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
 
   return (
     <>
-      <IconButton display={{ base: "flex" }} icon={<ViewIcon />} onClick={onOpen} />
+      <IconButton
+        display={{ base: "flex" }}
+        icon={<ViewIcon />}
+        onClick={onOpen}
+      />
 
       <Modal onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />

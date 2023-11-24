@@ -7,9 +7,16 @@ import Loading from "./Loading";
 import CustomButton from "./CustomButton";
 import { UpdateProfile, UserLogin } from "../redux/userSlice";
 import { apiRequest, handleFileUpload } from "../utils";
+import { Controller } from 'react-hook-form'
+import {
+
+  useToast,
+
+} from "@chakra-ui/react";
 
 function EditProfile() {
   const { user } = useSelector((state) => state.user);
+    const toast = useToast();
   const dispatch = useDispatch();
   const [errMsg, setErrMsg] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,10 +25,11 @@ function EditProfile() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({
     mode: "onChange",
-    defaultValues: { ...user },
+      defaultValues: { ...user, account: 'public' },
   });
 
   const onSubmit = async (data) => {
@@ -29,7 +37,33 @@ function EditProfile() {
     setErrMsg("");
     try {
       const uri = picture && (await handleFileUpload(picture));
-      const { firstName, lastName, location, profession } = data;
+      const { firstName, lastName, location, profession,account } = data;
+
+       const trimmedData = {
+    firstName: data.firstName.trim(),
+    lastName: data.lastName.trim(),
+    location: data.location.trim(),
+    profession: data.profession.trim(),
+  };
+
+  if (
+    Object.values(trimmedData).some((value) => {
+      return value === "";
+    })
+  ) {
+   
+  
+     toast({
+        title: "Please fill the form",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+      });
+    setIsSubmitting(false);
+    return;
+  }
+
       const res = await apiRequest({
         url: "/users/update-user",
         data: {
@@ -37,6 +71,7 @@ function EditProfile() {
           lastName,
           location,
           profession,
+          account,
           profileUrl: uri ? uri : user?.profileUrl,
         },
         method: "PUT",
@@ -143,6 +178,17 @@ function EditProfile() {
                 styles="w-full "
                 error={errors.location ? errors.location.message : ""}
               />
+              <label className="text-base text-ascent-2">Account Privacy:</label>
+      <Controller
+        control={control}
+        name="account"
+        render={({ field }) => (
+          <select {...field} className="p-2 border rounded-md">
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </select>
+        )}
+      />
               <label
                 className="flex items-center gap-1 text-base text-ascent-2 hover:text-ascent-1 cursor-pointer my-4"
                 htmlFor="imgUpload"

@@ -4,12 +4,13 @@ import cors from "cors";
 import morgan from "morgan";
 import bodyParser from "body-parser";
 import path from "path";
-import { Server } from 'socket.io';
+import { Server } from "socket.io";
 // security packges
 import helmet from "helmet";
 import dbConnection from "./dbConfig/index.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 import router from "./routes/index.js";
+
 
 dotenv.config();
 
@@ -33,34 +34,63 @@ app.use(morgan("dev"));
 app.use(router);
 app.use(errorMiddleware);
 
-const server= app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server running on port:${PORT}`);
 });
-
 
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
     origin: "http://localhost:3000",
+    
   },
 });
 
+const emailToSocketIdMap = new Map()
+const socketidToEmailMap = new Map()
+
 
 io.on("connection", (socket) => {
-  console.log("connected to socket.io")
-  socket.on('setup', (userData) => {
-    
-    socket.join(userData._id)
-    console.log(userData._id)
+  console.log("connected to socket.io");
 
-    socket.emit('connected')
+  socket.on("setup", (userData) => {
+    socket.join(userData._id);
+   
+    const { email, room } = userData;
+    emailToSocketIdMap.set(email, socket.id)
+    socketidToEmailMap.set(socket.id, email)
+    io.to(room).emit("user:joined", { email, id: socket.id })
+    socket.join(room)
+   io.to(socket.id).emit("setup",userData)
+
+    socket.emit("connected");
+
+   
   });
 
-    socket.on("join chat", (room) => {
+  socket.on('user:call', ({ to, offer }) => {
+    io.to(to).emit("incomming:call",{from:socket.id,offer})
+  })
+
+  socket.on("call:accepted", ({ to, ans }) => {
+  io.to(to).emit("call:accepted",{from:socket.id,ans})
+  })
+
+  socket.on('peer:nego:needed', ({ to, offer }) => {
+     io.to(to).emit("peer:nego:needed",{from:socket.id,offer})
+    
+  })
+
+  socket.on('peer:nego:done', ({to,ans}) => {
+     io.to(to).emit("peer:nego:final",{from:socket.id,ans})
+  })
+
+
+  socket.on("join chat", (room) => {
     socket.join(room);
     console.log("User Joined Room: " + room);
-    });
-  
+  });
+
   socket.on("typing", (room) => socket.in(room).emit("typing"));
   socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
 
@@ -76,10 +106,8 @@ io.on("connection", (socket) => {
     });
   });
 
-    socket.off("setup", () => {
+  socket.off("setup", () => {
     console.log("USER DISCONNECTED");
     socket.leave(userData._id);
   });
-
-
-})
+});

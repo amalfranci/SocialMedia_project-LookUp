@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux/es/hooks/useSelector";
 import {
+
+  useToast,
+
+} from "@chakra-ui/react";
+
+import {
   CustomButton,
   EditProfile,
   FriendsCard,
@@ -10,8 +16,9 @@ import {
   TextInput,
   TopBar,
 } from "../components";
+ 
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { NoProfile } from "../assets";
 import { BsFiletypeGif, BsPersonFillAdd } from "react-icons/bs";
 import { AiOutlineCloseCircle } from "react-icons/ai";
@@ -34,12 +41,15 @@ import { useDispatch } from "react-redux";
 import { UserLogin } from "../redux/userSlice";
 
 function Home() {
+  const navigate = useNavigate()
+   const toast = useToast();
   const { user, edit } = useSelector((state) => state.user);
   const { posts } = useSelector((state) => state.posts);
   const [friendRequest, setFriendRequest] = useState([]);
   const [suggestedFriends, setSuggestedFriends] = useState([]);
   const [errMsg, setErrMsg] = useState("");
   const [files, setFiles] = useState([]);
+  const [friendRe,setFriendRe]=useState(false)
   const pendingFriendRequestsStorageKey = "pendingFriendRequests";
 
   const storedPendingFriendRequests =
@@ -58,26 +68,39 @@ function Home() {
     formState: { errors },
   } = useForm();
 
+  const allowedExtensions = ["png", "jpg", "jpeg", "mp4", "avi"];
+  
   const handlePostSubmit = async (data) => {
     setPosting(true);
     setErrMsg("");
 
     try {
       const imageUris = [];
-      for (const file of files) {
-        const uri = await handleFileUpload(file);
-        imageUris.push(uri);
-        console.log("my muti", imageUris);
-      }
-
-      const newData = { ...data, images: imageUris };
-
-      if (imageUris.length === 0 && !newData.description) {
-        setErrMsg("Please upload at least one file or provide a description.");
+    for (const file of files) {
+      const extension = file.name.split(".").pop().toLowerCase();
+      if (!allowedExtensions.includes(extension)) {
+        setErrMsg("Please upload files with allowed extensions: png, jpg, jpeg, mp4, avi");
         setPosting(false);
         return;
       }
+      const uri = await handleFileUpload(file);
+      imageUris.push(uri);
+   
+    }
 
+      const newData = { ...data, images: imageUris };
+
+       if (!newData.description.trim() && imageUris.length === 0) {
+    toast({
+        title: "Write something about post",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+      });
+      setPosting(false);
+      return;
+    }
       const res = await apiRequest({
         url: "/posts/create-post",
         data: newData,
@@ -86,7 +109,9 @@ function Home() {
       });
 
       if (res?.status === "failed") {
-        setErrMsg(res);
+ alert("You have been blocked by admin")
+      
+        navigate("/login")
       } else {
         reset({
           description: "",
@@ -194,6 +219,9 @@ function Home() {
         data: { rid: id, status },
       });
       setFriendRequest(res?.data);
+      setFriendRe(true)
+      getUser()
+      fetchSuggestedFriend()
     } catch (error) {
       console.log(error);
     }
@@ -243,7 +271,11 @@ function Home() {
     fetchPost();
     fetchSuggestedFriend();
     fetchFriendRequests();
+    
+
   }, []);
+
+  
 
   return (
     <>
@@ -272,8 +304,9 @@ function Home() {
                   styles="w-full rounded-full py-5"
                   placeholder="what's on your mind..."
                   name="description"
-                  register={register("description", {
-                    required: files ? false : "Write something about the post",
+                
+                   register={register("description", {
+                    required: files.length===0  ?  "Write something about post":false,
                   })}
                   error={errors.description ? errors.description.message : ""}
                 />
@@ -394,7 +427,7 @@ function Home() {
                         title="Accept"
                         onclick={() => {
                           acceptFriendRequest(_id, "Accepted");
-                          window.location.reload();
+                        
                         }}
                         containerStyles="bg-[#0444a4] text-xs text-white px-1.5 py-1 rounded-full "
                       />

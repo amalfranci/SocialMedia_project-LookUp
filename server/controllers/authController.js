@@ -71,6 +71,7 @@ export const login = async (req, res, next) => {
     }
     user.password = undefined;
     const token = createJWT(user?._id);
+    console.log("my server side check",token)
     res.status(201).json({
       success: true,
       message: "Login Successfully",

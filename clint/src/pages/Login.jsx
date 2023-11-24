@@ -35,6 +35,15 @@ function Login() {
         setErrMsg("");
         const newData = { token: res?.token, ...res?.user };
 
+        const userTokenInformaton = res?.token
+        const UserTokendata = JSON.stringify(userTokenInformaton);
+
+           if (UserTokendata && UserTokendata.startsWith('"') && UserTokendata.endsWith('"')) {
+var datatoken = UserTokendata.slice(1, -1); 
+}
+
+        localStorage.setItem('userData', datatoken);
+
         dispatch(UserLogin(newData));
         window.location.replace("/");
       }

@@ -12,7 +12,6 @@ import {
   MenuList,
 } from "@chakra-ui/menu";
 
-
 import {
   Drawer,
   DrawerBody,
@@ -32,22 +31,24 @@ import { Spinner } from "@chakra-ui/spinner";
 
 import NotificationBadge from "react-notification-badge";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Logout } from "../../redux/userSlice.js";
 import UserListItem from "../userAvatar/UserListItem.jsx";
 import ChatLoading from "./ChatLoading.jsx";
+import { getSender } from "../../config/ChatLogics.js";
+import Effect from "react-notification-badge/lib/components/Effect.js";
+import { Link } from "react-router-dom";
+import { TbSocial } from "react-icons/tb";
 
 function SideDrawer() {
-
-  const dispatch=useDispatch()
-    
+  const dispatch = useDispatch();
 
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
-  
-    const {
+
+  const {
     setSelectedChat,
     user,
     notification,
@@ -58,8 +59,6 @@ function SideDrawer() {
 
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-
 
   const handleSearch = async () => {
     if (!search) {
@@ -75,14 +74,16 @@ function SideDrawer() {
 
     try {
       setLoading(true);
-       const config = {
+      const config = {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       };
 
-
-      const { data } = await axios.get(`http://localhost:8800/users/all-users?search=${search}`,config);
+      const { data } = await axios.get(
+        `http://localhost:8800/users/all-users?search=${search}`,
+        config
+      );
 
       setLoading(false);
       setSearchResult(data);
@@ -98,9 +99,7 @@ function SideDrawer() {
     }
   };
 
-    const accessChat = async (userId) => {
-  
-
+  const accessChat = async (userId) => {
     try {
       setLoadingChat(true);
       const config = {
@@ -109,7 +108,12 @@ function SideDrawer() {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const { data } = await axios.post(`http://localhost:8800/users/access-chat`, { userIde:userId }, config);
+      const { data } = await axios.post(
+        `http://localhost:8800/users/access-chat`,
+        { userIde: userId },
+        config
+      );
+    
 
       if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
       setSelectedChat(data);
@@ -126,8 +130,6 @@ function SideDrawer() {
       });
     }
   };
-
-
 
   return (
     <>
@@ -148,34 +150,42 @@ function SideDrawer() {
             </Text>
           </Button>
         </Tooltip>
-        <Text fontSize="2xl" fontFamily="Work sans">
-          LookUp-Live
-        </Text>
+        <Link to="/" className="flex gap-2 items-center">
+        <div className="p-1 md:p-2 bg-[#065ad8] rounded text-white">
+          <TbSocial/>
+        </div>
+        <span className="text-xl md:text-2xl text-[#065ad8] font-semibold">
+          LookUp
+        </span>
+      </Link>
+      
+      
+       
         <div>
           <Menu>
             <MenuButton p={1}>
               <NotificationBadge
-                // count={notification.length}
-                // effect={Effect.SCALE}
+                count={notification.length}
+                effect={Effect.SCALE}
               />
               <BellIcon fontSize="2xl" m={1} />
             </MenuButton>
-            {/* <MenuList pl={2}>
+            <MenuList pl={2}>
               {!notification.length && "No New Messages"}
               {notification.map((notif) => (
                 <MenuItem
-                  // key={notif._id}
-                  // onClick={() => {
-                  //   setSelectedChat(notif.chat);
-                  //   setNotification(notification.filter((n) => n !== notif));
-                  // }}
+                  key={notif._id}
+                  onClick={() => {
+                    setSelectedChat(notif.chat);
+                    setNotification(notification.filter((n) => n !== notif));
+                  }}
                 >
                   {notif.chat.isGroupChat
                     ? `New Message in ${notif.chat.chatName}`
                     : `New Message from ${getSender(user, notif.chat.users)}`}
                 </MenuItem>
               ))}
-            </MenuList> */}
+            </MenuList>
           </Menu>
           <Menu>
             <MenuButton as={Button} bg="white" rightIcon={<ChevronDownIcon />}>
@@ -196,7 +206,7 @@ function SideDrawer() {
           </Menu>
         </div>
       </Box>
-       <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
+      <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
         <DrawerOverlay />
         <DrawerContent>
           <DrawerHeader borderBottomWidth="1px">Search Users</DrawerHeader>
@@ -211,7 +221,7 @@ function SideDrawer() {
               <Button onClick={handleSearch}>Go</Button>
             </Box>
             {loading ? (
-              <ChatLoading/>
+              <ChatLoading />
             ) : (
               searchResult?.map((user) => (
                 <UserListItem
@@ -225,8 +235,8 @@ function SideDrawer() {
           </DrawerBody>
         </DrawerContent>
       </Drawer>
-      </>
-  )
+    </>
+  );
 }
 
-export default SideDrawer
+export default SideDrawer;
