@@ -75,7 +75,7 @@ function Profile() {
               ))
             ) : (
               <div className="flex w-full h-full items-center justify-center">
-                <p className="text-lg text-ascent-2">This account is private</p>
+                <p className="text-lg text-ascent-2">No Post Available</p>
               </div>
             )}
           </div>

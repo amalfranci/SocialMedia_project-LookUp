@@ -24,7 +24,7 @@ function EditPostModal({ post, fetchPost, onClose }) {
     formState: { errors },
   } = useForm({
     mode: "onChange",
-    defaultValues: { description: post.description }, 
+    defaultValues: { description: post.description }, // Pass the current description from the 'post' prop
   });
 
   const onSubmit = async (data) => {
@@ -34,10 +34,10 @@ function EditPostModal({ post, fetchPost, onClose }) {
       const uri = file.length > 0 && (await handleFileUpload(file[0]));
       const { description } = data;
       const res = await apiRequest({
-        url: "/posts/update-post/" + post._id, 
+        url: "/posts/update-post/" + post._id, // Use the post's ID from the 'post' prop
         data: {
           description,
-          // image: uri ? uri : post.image,
+          image: uri ? uri : post.image,
         },
         method: "PUT",
       });
@@ -45,7 +45,7 @@ function EditPostModal({ post, fetchPost, onClose }) {
         setErrMsg(res);
       } else {
         setErrMsg(res);
-        
+        // Delay the page refresh for 2 seconds (2000 milliseconds)
         await fetchPost();
         onClose();
       }
@@ -112,14 +112,14 @@ function EditPostModal({ post, fetchPost, onClose }) {
                 className="flex items-center gap-1 text-base text-ascent-2 hover:text-ascent-1 cursor-pointer my-4"
                 htmlFor="imgUpload"
               >
-                {/* <input
+                <input
                   type="file"
                   name="image"
                   className=""
                   id="imgUpload"
                   onChange={handleSelect}
                   accept=".jpg,.png,.jpeg,.mp4"
-                /> */}
+                />
               </label>
               {errMsg?.message && (
                 <span

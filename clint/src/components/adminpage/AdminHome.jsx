@@ -1,89 +1,96 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../admin_help_page/navbar/Navbar";
+import Sidenav from "../admin_help_page/Sidenav";
 import Box from "@mui/material/Box";
+import Navbar from "../admin_help_page/navbar/Navbar";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
+
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import Sidenav from "../admin_help_page/Sidenav";
+import Stack from "@mui/material/Stack";
 import { apiRequest } from "../../utils";
-import Graph from "../admin_help_page/Chart/Graph";
 
 export function AdminHome() {
-  const [count, setCount] = useState('');
-  const [usersPerMonth, setUsersPermonth] = useState([]);
 
-  const convertToMonthName = (monthNumber) => {
-    const months = [
-      null,
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    return months[monthNumber];
-  };
-
-  useEffect(() => {
+  const [count, setCount] = useState('')
+   useEffect(() => {
     async function fetchUserCount() {
       try {
-        const usersCount = await apiRequest({
-          url: "/admin/user-count",
-          method: "GET",
-        });
-        setCount(usersCount.totalCount);
-        setUsersPermonth(usersCount.usersPerMonth);
-      } catch (error) {
-        console.error(error.message);
-      }
+    const usersCount = await apiRequest({
+      url: "/admin/user-count",
+      method: "GET",
+    });
+    
+       
+    setCount(usersCount.count)
+    return  usersCount;
+  } catch (error) {
+    console.error(error.message);
+  }
     }
+
     fetchUserCount();
-  }, []);
-
-  const chartData = Array.from(
-    { length: 12 },
-    (_, i) => usersPerMonth.find((item) => item._id === i + 1)?.count || 0
-  );
-  const labels = Array.from({ length: 12 }, (_, i) =>
-    convertToMonthName(i + 1)
-  );
-
+   }, []);
+ 
+    
   return (
     <>
       <Navbar />
-      <Box height={70}  width={30}/>
+      <Box height={70} />
+
       <Box sx={{ display: "flex" }}>
         <Sidenav />
+
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-          <Grid container spacing={0}>
-            <Grid item xs={3}>
-              <Card sx={{ maxWidth: 49 + "%", height: 140 }}>
-                <CardContent>
-                  <Typography gutterBottom variant="h5" component="div">
-                    Total Members
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ fontSize: '24px', textAlign: 'center' }}
-                  >
-                    {count}
-                  </Typography>
-                </CardContent>
-              </Card>
+          <Grid container spacing={2}>
+            <Grid item xs={8}>
+              <Stack spacing={2} direction="row">
+                <Card sx={{ maxWidth: 49 + "%", height: 140 }}></Card>
+                <Card sx={{ maxWidth: 49 + "%", height: 140 }}>
+                  <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                      Total Members
+                    </Typography>
+<Typography
+  variant="body2"
+  color="text.secondary"
+  sx={{ fontSize: '24px', textAlign: 'center' }}
+>
+  {count}
+</Typography>
+
+                  </CardContent>
+                </Card>
+              </Stack>
+            </Grid>
+            <Grid item xs={4}>
+              <Stack spacing={2}>
+                <Card sx={{ maxWidth: 345 }}>
+                  <CardContent>
+                    <Typography
+                      gutterBottom
+                      variant="h5"
+                      component="div"
+                    ></Typography>
+                  </CardContent>
+                </Card>
+                <Card sx={{ maxWidth: 345 }}>
+                  <CardContent>
+                    <Typography
+                      gutterBottom
+                      variant="h5"
+                      component="div"
+                    ></Typography>
+                  </CardContent>
+                </Card>
+              </Stack>
             </Grid>
           </Grid>
-          <div className="h-[500px] w-[600px]">
-            <Graph chartData={chartData} labels={labels} />
-          </div>
+          <Box height={20} />
+          <Grid container spacing={2}>
+            <Grid item xs={8}></Grid>
+            <Grid item xs={4}></Grid>
+          </Grid>
         </Box>
       </Box>
     </>

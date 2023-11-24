@@ -15,15 +15,12 @@ import { ChakraProvider } from '@chakra-ui/react'
 import UserPage from "./components/admin_help_page/UserPage";
 import ComplaintToken from "./components/admin_help_page/ComplaintToken";
 import ChatProvider from "./components/Context/ChatProvider";
-import VideoChat from "./pages/VideoChat";
-import Room from "./components/miscellaneous/VideoCall/Room";
 
 function Layout() {
   const { user } = useSelector((state) => state.user);
   const loaction = useLocation();
 
-
-  return user?.token  ? (<>
+  return user?.token ? (<>
    <ChatProvider>
     <ChakraProvider>
     <ToastContainer/>
@@ -60,9 +57,7 @@ function App() {
         
           <Route path="/" element={<Home />} />
           <Route path="/profile/:id?" element={<Profile />} />
-          <Route path="/chats" element={<Chat />} />
-          <Route path="/videochat" element={<VideoChat />} />
-          <Route path="/room/:roomId" element={<Room/>}/>
+          <Route path="/chats" element={<Chat/>}/>
           
         </Route>
          
