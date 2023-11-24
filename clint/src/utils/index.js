@@ -6,36 +6,22 @@ const API_URL = "http://localhost:8800";
 
 export const API = axios.create({
   baseURL: API_URL,
-     headers: {
-        "Content-Type": "application/json",
-    },
+  responseType: "json",
 });
 
-API.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('userData')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    
-    return Promise.reject(error);
-  }
- 
-);
-
-export const apiRequest = async ({ url, data, method, token }) => {
+export const apiRequest = async ({ url, token, data, method }) => {
   try {
     const result = await API(url, {
       method: method || "GET",
       data: data,
-    
+      headers: {
+        "content-type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
     });
     return result?.data;
   } catch (error) {
-    const err = error?.response?.data;
+    const err = error.response.data;
     console.log(err);
     return { status: err.success, message: err.message };
   }
@@ -70,7 +56,6 @@ export const fetchPosts = async (token, dispatch, uri, data) => {
       method: "POST",
       data: data || {},
     });
-    console.log("check post are comming",res)
     dispatch(SetPosts(res?.data));
     return;
   } catch (error) {
@@ -135,10 +120,6 @@ export const getUsersList = async () => {
     console.error(error.message);
   }
 };
-
-
-
-
 
 export const getUserPost = async () => {
   try {

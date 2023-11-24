@@ -1,4 +1,4 @@
-import Chat from "../models/chatModel.js";
+import Chat from "../models/chatModel.js"
 import Users from "../models/userModel.js";
 import Message from "../models/messageModel.js";
 
@@ -17,6 +17,7 @@ export const allMessages = async (req, res) => {
 // create New message
 
 export const sendMessage = async (req, res) => {
+
   const { content, chatId } = req.body;
 
   if (!content || !chatId) {
@@ -33,8 +34,8 @@ export const sendMessage = async (req, res) => {
   try {
     var message = await Message.create(newMessage);
 
-    message = await message.populate("sender", "firstName profileUrl");
-    message = await message.populate("chat");
+    message = await message.populate("sender", "firstName profileUrl")
+    message = await message.populate("chat")
     message = await Users.populate(message, {
       path: "chat.users",
       select: "firstName profileUrl email",
@@ -47,3 +48,8 @@ export const sendMessage = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+
+
+
+

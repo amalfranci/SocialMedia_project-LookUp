@@ -113,14 +113,6 @@ function Register() {
                 type="password"
                 register={register("password", {
                   required: "passwword  is required",
-                  minLength: {
-                    value: 6,
-                    message:"Password must be at least 6 characters long",
-                  },
-                  pattern: {
-                    value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/,
-                    message:"Password must contain at least one letter and one number"
-                  }
                 })}
                 styles="w-full "
                 error={errors.password ? errors.password.message : ""}

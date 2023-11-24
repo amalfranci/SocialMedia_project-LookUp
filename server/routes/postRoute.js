@@ -2,7 +2,7 @@ import express from "express";
 import userAuth from "../middleware/authMiddleware.js";
 import {
   createPost,
-
+  getPost,
   getPosts,
   getUserPost,
   deletePost,
@@ -13,7 +13,6 @@ import {
   replyPostComment,
   updatePost,
   reportPost,
-  deleteComment,
 } from "../controllers/postController.js";
 
 const router = express.Router();
@@ -23,7 +22,7 @@ router.post("/create-post", userAuth, createPost);
 
 // get post
 router.post("/", userAuth, getPosts);
-
+router.post("/:id", userAuth, getPost);
 
 router.post("/get-user-post/:id", userAuth, getUserPost);
 // get post comments
@@ -44,6 +43,4 @@ router.post('/reportPost/:postId', reportPost);
 // delete a post
 router.delete("/:id", userAuth, deletePost);
 
-// 
-router.delete('/comment/:commentId',userAuth,deleteComment)
 export default router;

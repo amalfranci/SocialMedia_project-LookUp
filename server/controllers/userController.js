@@ -203,7 +203,7 @@ export const getUser = async (req, res, next) => {
 
 export const updateUser = async (req, res, next) => {
   try {
-    const { firstName, lastName, location, profileUrl, profession,account  } = req.body;
+    const { firstName, lastName, location, profileUrl, profession } = req.body;
 
     if (!(firstName || lastName || profession || location || profileUrl)) {
       next("please provide all required fields");
@@ -216,7 +216,6 @@ export const updateUser = async (req, res, next) => {
       location,
       profileUrl,
       profession,
-           account,
       _id: userId,
     };
 
@@ -461,27 +460,36 @@ export const mutualFriends = async (req, res) => {
 };
 
 export const allUsers = async (req, res) => {
+  
   try {
-    const keyword = req.query.search
-      ? {
-          $or: [
-            { firstName: { $regex: req.query.search, $options: "i" } },
-            { email: { $regex: req.query.search, $options: "i" } },
-          ],
-        }
+    const keyword = req.query.search ? {
+      $or: [
+          { firstName: { $regex: req.query.search, $options: "i" } },
+          { email: { $regex: req.query.search, $options: "i" } },
+        ],
+      
+    }
       : {};
-    const { userId } = req.body.user;
-
+     const { userId } = req.body.user;
+  
     const users = await Users.find(keyword).find({ _id: { $ne: userId } });
-    if (!users) {
+     if (!users) {
       return res
         .status(404)
         .json({ success: false, message: "user not found" });
     }
 
-    return res.send(users).status(200);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "An error occurred" });
+    
+    return res
+       .send(users)
+      .status(200)
+     
   }
-};
+  catch (error)
+  {
+    console.error(error)
+  res.status(500).json({ error: "An error occurred" });}
+
+}
+
+

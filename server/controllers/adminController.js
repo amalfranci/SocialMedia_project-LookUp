@@ -58,26 +58,13 @@ const getPosts = async (req, res) => {
 
 const getUserCount = async (req, res) => {
   try {
-    // Get count of all documents
-    const totalCount = await Users.countDocuments();
-
-    // Aggregation to get count of users per month
-    const usersPerMonth = await Users.aggregate([
-      {
-        $group: {
-          _id: { $month: "$createdAt" }, // Group by month
-          count: { $sum: 1 },
-        },
-      },
-    ]);
-
-    res.json({ totalCount, usersPerMonth }); // Send both counts as JSON response
+    const count = await Users.countDocuments();
+    res.json({ count }); // Send the count as JSON response
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: "An error occurred" }); // Send an error response with a 500 status code
   }
 };
-
 
 const getReportedPosts = async (req, res) => {
   try {
@@ -143,11 +130,6 @@ const blockUser = async (req, res) => {
   }
 };
 
-
-
-  
-
-
 export {
   adminLogin,
   getUsers,
@@ -156,5 +138,4 @@ export {
   blockPost,
   getReportedPosts,
   getUserCount,
-
 };

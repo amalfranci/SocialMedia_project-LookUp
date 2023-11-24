@@ -1,13 +1,14 @@
 export const getSender = (loggedUser, users) => {
-  return users[0]?._id === loggedUser?._id
-    ? users[1].firstName
-    : users[0].firstName;
-};
+    return users[0]._id===loggedUser._id ? users[1].firstName : users[0].firstName
+    
+}
 export const getSenderFull = (loggedUser, users) => {
-  return users[0]._id === loggedUser._id ? users[1] : users[0];
-};
+ 
+    return users[0]._id===loggedUser._id ? users[1]: users[0]
+    
+}
 export const isSameSenderMargin = (messages, m, i, userId) => {
-  
+  // console.log(i === messages.length - 1);
 
   if (
     i < messages.length - 1 &&

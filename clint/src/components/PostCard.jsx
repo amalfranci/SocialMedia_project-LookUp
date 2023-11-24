@@ -165,8 +165,6 @@ const CommentForm = ({ user, id, replyAt, getComments }) => {
 };
 
 function PostCard({ post, user, deletePost, fetchPost, like }) {
-
-
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [reporting, setReporting] = useState(false);
   const [reported, setReported] = useState(post?.status === "pending");
@@ -246,46 +244,6 @@ function PostCard({ post, user, deletePost, fetchPost, like }) {
       }
     }
   };
- const handleDeleteComment = async (commentId) => {
-  try {
-    const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: 'You are about to delete this comment!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!',
-    });
-
-    if (result.isConfirmed) {
-      const response = await fetch(`http://localhost:8800/posts/comment/${commentId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${user?.token}`,
-        },
-      });
-
-      if (response.ok) {
-        console.log('Comment deleted successfully.');
-       
-        const updatedComments = comments.filter(comment => comment._id !== commentId);
-        setComments(updatedComments);
-       
-        Swal.fire('Deleted!', 'Your comment has been deleted.', 'success');
-        
-      } else {
-        console.error('Comment deletion failed.');
-        Swal.fire('Error!', 'Failed to delete the comment.', 'error');
-      }
-    }
-  } catch (error) {
-    console.error('An error occurred while deleting the comment:', error);
-    Swal.fire('Error!', 'An error occurred while deleting the comment.', 'error');
-  }
-};
-
 
   return (
     <div className="mb-2 bg-primary p-4 rounded-xl">
@@ -500,12 +458,6 @@ function PostCard({ post, user, deletePost, fetchPost, like }) {
                       onClick={() => setReplyComments(comment?._id)}
                     >
                       Reply
-                    </span>
-                        <span
-                      className="text-blue cursor-pointer"
-                      onClick={() => handleDeleteComment(comment?._id)}
-                    >
-                      Delete
                     </span>
                   </div>
 
