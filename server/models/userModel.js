@@ -44,6 +44,11 @@ const userSchema = new mongoose.Schema({
         enum: ["blocked", "unblocked"],
         default: "unblocked" 
     },
+     account: {
+        type: String,
+        enum: ["public", "private"],
+        default: "public"
+    },
 
     
 },

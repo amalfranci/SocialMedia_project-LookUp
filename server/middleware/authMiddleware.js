@@ -1,4 +1,5 @@
 import JWT from "jsonwebtoken"
+import Users from "../models/userModel.js";
 
 const userAuth = async (req, res, next) => {
 
@@ -6,13 +7,19 @@ const userAuth = async (req, res, next) => {
 
     if (!authHeader || !authHeader?.startsWith("Bearer")) {
         
-        next("Authentication==failed")
+        next("Authentication failed")
     }
 
     const token = authHeader?.split(" ")[1];
 
     try {
         const userToken = JWT.verify(token, process.env.JWT_SECRET_KEY)
+        const userstaus = await Users.findById(userToken.userId)
+        console.log("dsadsadasd",userstaus.status)
+        if (userstaus.status !== "unblocked")
+        {
+             next("Authentication failed");
+           }
         
         req.body.user = {
             userId:userToken.userId,

@@ -5,36 +5,34 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
-    ModalCloseButton,
+  ModalCloseButton,
   Button,
   useDisclosure,
   useToast,
   FormControl,
   Box,
-  Input
-} from '@chakra-ui/react'
-import React, { useState } from 'react'
-import { ChatState } from '../Context/ChatProvider';
-import UserListItem from '../userAvatar/UserListItem';
-import axios from 'axios';
-import UserBadgeItem from '../userAvatar/UserBadgeItem';
-
+  Input,
+} from "@chakra-ui/react";
+import React, { useState } from "react";
+import { ChatState } from "../Context/ChatProvider";
+import UserListItem from "../userAvatar/UserListItem";
+import axios from "axios";
+import UserBadgeItem from "../userAvatar/UserBadgeItem";
 
 function GroupChatModal({ children }) {
-   
-     const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [groupChatName, setGroupChatName] = useState();
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
-    const toast = useToast()
-    
-    const { user, chats, setChats } = ChatState()
-   const handleDelete = (delUser) => {
+  const toast = useToast();
+
+  const { user, chats, setChats } = ChatState();
+  const handleDelete = (delUser) => {
     setSelectedUsers(selectedUsers.filter((sel) => sel._id !== delUser._id));
   };
-   const handleSearch = async (query) => {
+  const handleSearch = async (query) => {
     setSearch(query);
     if (!query) {
       return;
@@ -47,8 +45,11 @@ function GroupChatModal({ children }) {
           Authorization: `Bearer ${user.token}`,
         },
       };
-    const { data } = await axios.get(`http://localhost:8800/users/all-users?search=${search}`,config);
-      console.log(data);
+      const { data } = await axios.get(
+        `http://localhost:8800/users/all-users?search=${search}`,
+        config
+      );
+
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
@@ -78,7 +79,7 @@ function GroupChatModal({ children }) {
     setSelectedUsers([...selectedUsers, userToAdd]);
   };
 
-    const handleSubmit = async () => {
+  const handleSubmit = async () => {
     if (!groupChatName || !selectedUsers) {
       toast({
         title: "Please fill all the feilds",
@@ -125,26 +126,23 @@ function GroupChatModal({ children }) {
     }
   };
 
-    
-    
-   return (
+  return (
     <>
-           <span onClick={onOpen}>{children }</span>
+      <span onClick={onOpen}>{children}</span>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-                   <ModalHeader 
-                    
-                           fontSize="35px"
-                           fontFamily='work sans'
-                           display='flex'
-                           justifyContent='center'>
-                           
-                           
-                       Create Group Chat</ModalHeader>
+          <ModalHeader
+            fontSize="35px"
+            fontFamily="work sans"
+            display="flex"
+            justifyContent="center"
+          >
+            Create Group Chat
+          </ModalHeader>
           <ModalCloseButton />
-         <ModalBody display="flex" flexDir="column" alignItems="center">
+          <ModalBody display="flex" flexDir="column" alignItems="center">
             <FormControl>
               <Input
                 placeholder="Chat Name"
@@ -168,7 +166,7 @@ function GroupChatModal({ children }) {
                 />
               ))}
             </Box>
-            {loading? (
+            {loading ? (
               // <ChatLoading />
               <div>Loading...</div>
             ) : (
@@ -184,15 +182,17 @@ function GroupChatModal({ children }) {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={onClose}>
+            <Button colorScheme="blue" mr={3} onClick={onClose}>
               Close
             </Button>
-            <Button variant='blue' onClick={handleSubmit}>Create Chat</Button>
+            <Button variant="blue" onClick={handleSubmit}>
+              Create Chat
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
     </>
-  )
+  );
 }
 
-export default GroupChatModal
+export default GroupChatModal;

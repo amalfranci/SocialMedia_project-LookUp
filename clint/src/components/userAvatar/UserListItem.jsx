@@ -3,11 +3,7 @@ import { Box, Text } from "@chakra-ui/layout";
 import { useSelector } from "react-redux";
 import { ChatState } from "../Context/ChatProvider";
 
-
 const UserListItem = ({ user, handleFunction }) => {
-  
-    
-
   return (
     <Box
       onClick={handleFunction}

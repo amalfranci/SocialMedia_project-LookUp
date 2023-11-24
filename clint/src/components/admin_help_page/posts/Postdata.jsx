@@ -152,9 +152,9 @@ const fetchPosts = async () => {
               <TableCell align="left" style={{ minWidth: "100px" }}>
               Created At
               </TableCell>
-              <TableCell align="left" style={{ minWidth: "100px" }}>
+              {/* <TableCell align="left" style={{ minWidth: "100px" }}>
            Description     
-              </TableCell>
+              </TableCell> */}
               <TableCell align="left" style={{ minWidth: "100px" }}>
                 Actions
               </TableCell>
@@ -171,7 +171,7 @@ const fetchPosts = async () => {
 
                         
                     <TableCell align="left">{formatDate(row.createdAt)}</TableCell>
-                        <TableCell align="left">{row.description}</TableCell>
+                        {/* <TableCell align="left">{row.description}</TableCell> */}
                   
                     <TableCell align="left">
                     <Button

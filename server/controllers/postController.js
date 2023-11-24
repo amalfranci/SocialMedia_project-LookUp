@@ -5,12 +5,12 @@ import Comments from "../models/commentModel.js";
 export const createPost = async (req, res, next) => {
   try {
     const { userId } = req.body.user;
-    const { description, images } = req.body; // Updated to accept an array of images
+    const { description, images } = req.body; 
 
     const post = await Posts.create({
       userId,
       description,
-      image: images, // Save the array of image URIs in the "image" field
+      image: images, 
     });
 
     res.status(200).json({
@@ -23,6 +23,8 @@ export const createPost = async (req, res, next) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// all users posts
 
 export const getPosts = async (req, res, next) => {
   try {
@@ -49,35 +51,41 @@ export const getPosts = async (req, res, next) => {
             },
           },
         ],
-        status: { $ne: "blocked" }, // Exclude posts with status "blocked"
+        status: { $ne: "blocked" },
       };
     } else {
-      searchQuery = { status: { $ne: "blocked" } }; // Exclude posts with status "blocked"
+      searchQuery = { status: { $ne: "blocked" } };
     }
 
     const posts = await Posts.find(searchQuery)
       .populate({
         path: "userId",
-        select: "firstName lastName location profileUrl -password",
+        select: "firstName lastName location profileUrl friends account visibility -password", // Include the visibility field
       })
       .sort({ _id: -1 });
 
     const friendsPosts = posts?.filter((post) => {
-      return friends.includes(post?.userId?._id.toString());
+    
+      
+      return friends.includes(post?.userId?._id.toString()) && post?.userId.account === 'private';
     });
+    
 
-    const otherPosts = posts?.filter(
-      (post) => !friends.includes(post?.userId?._id.toString())
+    const publicPosts = posts?.filter(
+      (post) => post?.userId.account === 'public' 
     );
+
+ 
 
     let postsRes = null;
 
-    if (friendsPosts?.length > 0) {
-      postsRes = search ? friendsPosts : [...friendsPosts, ...otherPosts];
-    } else {
-      postsRes = posts;
-    }
-
+   if (friendsPosts?.length > 0) {
+  postsRes = search ? friendsPosts : [...friendsPosts, ...publicPosts];
+} else {
+  postsRes = search ? publicPosts : [];
+}
+ 
+  
     res.status(200).json({
       success: true,
       message: "successfully",
@@ -89,41 +97,76 @@ export const getPosts = async (req, res, next) => {
   }
 };
 
-export const getPost = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const post = await Posts.findById(id).populate({
-      path: "userId",
-      select: "firstName lastName location profileUrl -password",
-    });
-    res.status(200).json({
-      success: true,
-      message: "successfully",
-      data: post,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(404).json({
-      message: error.message,
-    });
-  }
-};
+
+
+// //  individual users post
+// export const getPost = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const post = await Posts.findById(id)
+//       .populate({
+//         path: "userId",
+//         select: "firstName lastName location profileUrl account -password",
+//       });
+
+//     // Check if the post is private and the requester is not the owner
+//     if (post.userId.account === 'private' && post.userId._id.toString() !== req.body.user.userId) {
+//       return res.status(403).json({
+//         success: false,
+//         message: "Unauthorized access to private post",
+//       });
+//     }
+
+//     res.status(200).json({
+//       success: true,
+//       message: "successfully",
+//       data: post,
+//     });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(404).json({
+//       message: error.message,
+//     });
+//   }
+// };
 
 export const getUserPost = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const post = await Posts.find({ userId: id })
+    const user = await Users.findById(id);
+    const friends = user?.friends?.toString().split(",") ?? [];
+  
+console.log("this searching ",friends)
+    let searchQuery = { userId: id };
+    console.log("searching userId",searchQuery)
+
+    if (user.account === 'private') {
+      // If the user account is private, only include posts from friends
+      searchQuery.userId = { $in: friends };
+    }
+
+    const posts = await Posts.find(searchQuery)
       .populate({
         path: "userId",
-        select: "firstName lastName location profileUrl -password",
+        select: "firstName lastName location profileUrl account -password",
       })
       .sort({ _id: -1 });
 
+    // Modify the posts based on visibility and friends logic
+    let postsRes = null;
+
+    if (user.account === 'private') {
+      const friendsPosts = posts?.filter(post => friends.includes(post?.userId?._id.toString()));
+      postsRes = searchQuery.userId ? friendsPosts : [];
+    } else {
+      postsRes = posts;
+    }
+
     res.status(200).json({
-      sucess: true,
+      success: true,
       message: "successfully",
-      data: post,
+      data: postsRes,
     });
   } catch (error) {
     console.log(error);
@@ -271,21 +314,26 @@ export const commentPost = async (req, res, next) => {
     const { userId } = req.body.user;
     const { id } = req.params;
 
-    if (comment === null) {
-      res.status(404).json({ message: "Comment is required " });
+    if (!comment || !comment.trim()) {
+      return res.status(404).json({ message: "Comment is required" });
     }
+
     const newComment = new Comments({ comment, from, userId, postId: id });
     await newComment.save();
+
     const post = await Posts.findById(id);
     post.comments.push(newComment._id);
     const updatedPost = await Posts.findByIdAndUpdate(id, post, {
       new: true,
     });
+
     res.status(201).json({ newComment });
   } catch (error) {
     console.log(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
+
 
 export const replyPostComment = async (req, res, next) => {
   const { userId } = req.body.user;
@@ -313,34 +361,32 @@ export const replyPostComment = async (req, res, next) => {
   }
 };
 
-export const updatePost = async (req, res) => {
+export const updatePost = async (req, res,next) => {
   try {
     const { description, image } = req.body;
     const postId = req.params.id;
+    
 
-    if (!description && !image) {
+    if (!description ) {
       return res
         .status(400)
         .json({ message: "Please provide data to update the post." });
     }
 
-    // Check if the post exists
     const existingPost = await Posts.findById(postId);
 
     if (!existingPost) {
       return res.status(404).json({ message: "Post not found." });
     }
 
-    // Update only the fields that are provided in the request
     if (description) {
       existingPost.description = description;
     }
 
-    if (image) {
-      existingPost.image = image;
-    }
+    // if (image) {
+    //   existingPost.image = image;
+    // }
 
-    // Save the updated post
     const updatedPost = await existingPost.save();
 
     res.status(200).json({
@@ -358,20 +404,17 @@ export const updatePost = async (req, res) => {
 
 export const reportPost = async (req, res) => {
   const { postId } = req.params;
-  
 
   try {
-    // Find the post by ID
+ 
     const post = await Posts.findById(postId);
 
     if (!post) {
       return res.status(404).json({ message: "Post not found." });
     }
 
-    // Update the post's status to 'pending'
     post.status = "pending";
 
-    // Save the updated post
     await post.save();
 
     res.status(200).json({ message: "Post reported successfully." });
@@ -382,3 +425,23 @@ export const reportPost = async (req, res) => {
       .json({ message: "An error occurred while reporting the post." });
   }
 };
+
+// delete post comment 
+export const deleteComment = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+
+    
+    const deletedComment = await Comments.findByIdAndDelete(commentId);
+
+    if (!deletedComment) {
+      return res.status(404).json({ message: "Comment not found." });
+    }
+
+    res.status(200).json({ message: "Comment deleted successfully." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "An error occurred while deleting the comment." });
+  }
+};
+

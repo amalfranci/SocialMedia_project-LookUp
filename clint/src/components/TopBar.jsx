@@ -1,6 +1,6 @@
 import React from "react";
 import { TbSocial } from "react-icons/tb";
-import AutocompleteSearch from './Autocomplete';
+import AutocompleteSearch from "./Autocomplete";
 
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -31,7 +31,6 @@ function TopBar({ user }) {
   };
   const handleSearch = async (data) => {
     await fetchPosts(user.token, dispatch, "", data);
-    
   };
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -50,25 +49,24 @@ function TopBar({ user }) {
           LookUp
         </span>
       </Link>
-  <div className="hidden md:flex items-center justify-center">
-  <div style={{ position: 'relative', width: '200px' }}>
-    <AutocompleteSearch onSearch={handleSearch} user={user} dispatch={dispatch} />
-  </div>
-</div>
-    
+      <div className="hidden md:flex items-center justify-center">
+        <div style={{ position: "relative", width: "200px" }}>
+          <AutocompleteSearch
+            onSearch={handleSearch}
+            user={user}
+            dispatch={dispatch}
+          />
+        </div>
+      </div>
 
       <div className="flex gap-4 items-center text-ascent-1 text-md md:text-xl">
         <button onClick={() => handleTheme()}>
           {theme === "light" ? <BsMoon /> : <BsSunFill />}
         </button>
-        <div className="hidden lg:flex">
-          <IoMdNotificationsOutline />
-        </div>
+      
         <div>
           <Link to="/chats" className="text-ascent-1">
-            <BsFillChatDotsFill
-             user={user}
-            />
+            <BsFillChatDotsFill user={user} />
           </Link>
         </div>
         <div className="relative">
