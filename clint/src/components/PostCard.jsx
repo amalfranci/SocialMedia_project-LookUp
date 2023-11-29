@@ -337,6 +337,7 @@ function PostCard({ post, user, deletePost, fetchPost, like }) {
           <div className="mt-2 grid grid-cols-2 gap-2">
             {post.image.map((url, index) => (
               <div key={index} className="w-full">
+                
                 {url.toLowerCase().endsWith(".mp4") ? (
                   <video
                     controls

@@ -12,6 +12,7 @@ import errorMiddleware from "./middleware/errorMiddleware.js";
 import router from "./routes/index.js";
 
 
+
 dotenv.config();
 
 const app = express();
@@ -21,27 +22,54 @@ const __dirname = path.resolve(path.dirname(""));
 const PORT = process.env.PORT || 8800;
 dbConnection();
 
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+     
+      'img-src': ['self', 'res.cloudinary.com','localhost:8800'],
+    },
+  },
+}));
 app.use(cors());
 app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "views/build_frontend")));
 app.use(express.static(path.join(__dirname, "views/build")));
+
+
 
 app.use(morgan("dev"));
 app.use(router);
 app.use(errorMiddleware);
 
+app.get('*',(req,res)=>{
+   res.sendFile(path.join(__dirname,"views/build_frontend/index.html"))
+})
+
+app.use(
+  cors({
+    origin: 'http://localhost:3000',
+    methods: 'GET, PUT, POST, DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+    credentials: true, // Allow cookies to be sent in cross-origin requests
+  })
+);
+
 const server = app.listen(PORT, () => {
   console.log(`Server running on port:${PORT}`);
 });
+
+
 
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
     origin: "http://localhost:3000",
+  
     
   },
 });
