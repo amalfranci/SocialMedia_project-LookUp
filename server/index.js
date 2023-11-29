@@ -22,14 +22,16 @@ const __dirname = path.resolve(path.dirname(""));
 const PORT = process.env.PORT || 8800;
 dbConnection();
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
+// app.use(helmet({
+//   contentSecurityPolicy: {
+//     directives: {
      
-      'img-src': ['self', 'res.cloudinary.com','https://www.lookupzone.me'],
-    },
-  },
-}));
+//       'img-src': ['self', 'res.cloudinary.com','https://www.lookupzone.me'],
+//     },
+//   },
+// }));
+
+
 app.use(cors());
 app.use(bodyParser.json());
 
