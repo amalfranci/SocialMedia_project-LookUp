@@ -26,7 +26,7 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
      
-      'img-src': ['self', 'res.cloudinary.com','localhost:8800'],
+      'img-src': ['self', 'res.cloudinary.com','https://www.lookupzone.me'],
     },
   },
 }));
@@ -51,7 +51,9 @@ app.get('*',(req,res)=>{
 
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    // origin: 'http://localhost:3000',
+
+    origin: 'https://www.lookupzone.me',
     methods: 'GET, PUT, POST, DELETE',
     preflightContinue: false,
     optionsSuccessStatus: 204,
@@ -68,7 +70,7 @@ const server = app.listen(PORT, () => {
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "http://localhost:3000",
+    origin: "https://www.lookupzone.me",
   
     
   },

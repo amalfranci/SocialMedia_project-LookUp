@@ -33,7 +33,7 @@ const defaultOptions = {
   },
 };
 
-const ENDPOINT = "http://localhost:8800";
+const ENDPOINT = "https://www.lookupzone.me";
 var socket, selectedChatCompare;
 
 function SingleChat({ fetchAgain, setFetchAgain }) {
@@ -76,7 +76,9 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
       setLoading(true);
 
       const { data } = await axios.get(
-        `http://localhost:8800/users/${selectedChat._id}`,
+        // `http://localhost:8800/users/${selectedChat._id}`,
+
+        `https://www.lookupzone.me/users/${selectedChat._id}`,
         config
       );
       setMessages(data);
@@ -116,7 +118,9 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
         };
         setNewMessage("");
         const { data } = await axios.post(
-          "http://localhost:8800/users/sendmessage",
+          // "http://localhost:8800/users/sendmessage",
+
+           "https://www.lookupzone.me/users/sendmessage",
           {
             content: newMessage,
             chatId: selectedChat,
