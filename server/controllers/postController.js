@@ -63,6 +63,8 @@ export const getPosts = async (req, res, next) => {
         select: "firstName lastName location profileUrl friends account visibility -password", // Include the visibility field
       })
       .sort({ _id: -1 });
+    
+    
 
     const friendsPosts = posts?.filter((post) => {
     
@@ -75,6 +77,7 @@ export const getPosts = async (req, res, next) => {
       (post) => post?.userId.account === 'public' 
     );
 
+    
  
 
     let postsRes = null;
@@ -82,7 +85,7 @@ export const getPosts = async (req, res, next) => {
    if (friendsPosts?.length > 0) {
   postsRes = search ? friendsPosts : [...friendsPosts, ...publicPosts];
 } else {
-  postsRes = search ? publicPosts : [];
+  postsRes = search ? publicPosts : posts;
 }
  
   

@@ -25,9 +25,7 @@ function ResetPassword() {
         setErrMsg(res);
       } else {
         setErrMsg(res);
-        setTimeout(() => {
-          window.location.replace("/login");
-        }, 5000);
+      
       }
       setIsSubmitting(false);
     } catch (error) {

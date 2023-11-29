@@ -58,6 +58,9 @@ function Home() {
     storedPendingFriendRequests
   );
 
+
+  console.log("post",posts)
+
   const [posting, setPosting] = useState(false);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
@@ -289,7 +292,7 @@ function Home() {
           </div>
 
           {/* center */}
-          <div className="flex-1 h-full bg-primary px-4 flex flex-col gap-6 overflow-y-auto rounded-lg">
+          <div className="flex-1 h-full bg-primary px-4 flex flex-col gap-2 overflow-y-auto rounded-lg">
             <form
               onSubmit={handleSubmit(handlePostSubmit)}
               className="bg-primary px-4 rounded-lg"

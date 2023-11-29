@@ -43,6 +43,7 @@ var datatoken = UserTokendata.slice(1, -1);
 }
 
         localStorage.setItem('userData', datatoken);
+        
 
         dispatch(UserLogin(newData));
         window.location.replace("/");
