@@ -21,7 +21,7 @@ function Chat() {
         w="100%"
         h="91.5vh"
         p="10px"
-        bg="gray"
+        bg="white"
       >
         {user && <MyChats fetchAgain={fetchAgain} />}
         {user && (

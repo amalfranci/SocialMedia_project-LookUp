@@ -390,7 +390,7 @@ function PostCard({ post, user, deletePost, fetchPost, like }) {
       </div>
       <div className="mt-4 flex justify-between items-center px-3 py-2 text-ascent text-base border-t border-[#66666645]">
         <p
-          className="flex gap-2 items-center text-base cursor-pointer"
+          className="flex gap-2 items-center text-base text-ascent-1 cursor-pointer"
           onClick={() => handleLike("/posts/like/" + post?._id)}
         >
           {post?.likes?.includes(user?._id) ? (
@@ -398,26 +398,26 @@ function PostCard({ post, user, deletePost, fetchPost, like }) {
           ) : (
             <BiLike size={20} />
           )}
-          {post?.likes?.length} Likes
+          {post?.likes?.length} likes
         </p>
         <p
-          className="flex gap-2 items-center text-base cursor-pointer"
+          className="flex gap-2 items-center text-base text-ascent-1 cursor-pointer"
           onClick={() => {
             setShowComments(showComments === post._id ? null : post._id);
             getComments(post?._id);
           }}
         >
           <BiComment size={20} />
-          {post?.comments?.length} Comments
+          {post?.comments?.length} 
         </p>
         <p>
           {user?._id === post?.userId?._id ? (
-            <div className="flex gap-1 items-center text-base text-ascent-1 cursor-pointer">
+            <div className="flex gap-2 items-center text-base text-ascent-1 cursor-pointer">
               <FaEdit size={20} onClick={openEditModal} />
-              <span>Edit</span>
+             
             </div>
           ) : (
-            <div className="flex gap-1 items-center text-base text-ascent-1 cursor-pointer">
+            <div className="flex gap-2 items-center text-base text-ascent-1 cursor-pointer">
               {reported ? (
                 // Show "Reported" if the post has been reported
                 <span>Reported</span>
