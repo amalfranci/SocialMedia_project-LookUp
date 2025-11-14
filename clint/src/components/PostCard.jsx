@@ -222,9 +222,9 @@ function PostCard({ post, user, deletePost, fetchPost, like }) {
       // User confirmed the report, proceed with reporting
       try {
         const response = await fetch(
-          // `http://localhost:8800/posts/reportPost/${post._id}`,
+          `http://localhost:8800/posts/reportPost/${post._id}`,
 
-           `https://www.lookupzone.me/posts/reportPost/${post._id}`,
+          //  `https://www.lookupzone.me/posts/reportPost/${post._id}`,
           {
             method: "POST",
             headers: {
@@ -261,7 +261,7 @@ function PostCard({ post, user, deletePost, fetchPost, like }) {
     });
 
     if (result.isConfirmed) {
-      const response = await fetch(`https://www.lookupzone.me/posts/comment/${commentId}`, {
+      const response = await fetch(`http://localhost:8800/posts/comment/${commentId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

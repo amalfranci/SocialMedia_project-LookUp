@@ -53,9 +53,9 @@ app.get('*',(req,res)=>{
 
 app.use(
   cors({
-    // origin: 'http://localhost:3000',
+    origin: 'http://localhost:3000',
 
-    origin: 'https://www.lookupzone.me',
+    // origin: 'https://www.lookupzone.me',
     methods: 'GET, PUT, POST, DELETE',
     preflightContinue: false,
     optionsSuccessStatus: 204,
@@ -72,7 +72,7 @@ const server = app.listen(PORT, () => {
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "https://www.lookupzone.me",
+    origin: "http://localhost:8800",
   
     
   },

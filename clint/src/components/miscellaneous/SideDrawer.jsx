@@ -81,9 +81,9 @@ function SideDrawer() {
       };
 
       const { data } = await axios.get(
-        // `http://localhost:8800/users/all-users?search=${search}`,
+        `http://localhost:8800/users/all-users?search=${search}`,
 
-         `https://www.lookupzone.me/users/all-users?search=${search}`,
+        //  `https://www.lookupzone.me/users/all-users?search=${search}`,
         config
       );
 
@@ -111,9 +111,9 @@ function SideDrawer() {
         },
       };
       const { data } = await axios.post(
-        // `http://localhost:8800/users/access-chat`,
+        `http://localhost:8800/users/access-chat`,
 
-           `https://www.lookupzone.me/users/access-chat`,
+          //  `https://www.lookupzone.me/users/access-chat`,
         { userIde: userId },
         config
       );

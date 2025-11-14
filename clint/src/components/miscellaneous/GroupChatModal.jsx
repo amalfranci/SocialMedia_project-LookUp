@@ -46,9 +46,9 @@ function GroupChatModal({ children }) {
         },
       };
       const { data } = await axios.get(
-        // `http://localhost:8800/users/all-users?search=${search}`,
+        `http://localhost:8800/users/all-users?search=${search}`,
 
-           `https://www.lookupzone.me/users/all-users?search=${search}`,
+          //  `https://www.lookupzone.me/users/all-users?search=${search}`,
         config
       );
 
@@ -100,9 +100,9 @@ function GroupChatModal({ children }) {
         },
       };
       const { data } = await axios.post(
-        // `http://localhost:8800/users/group`,
+        `http://localhost:8800/users/group`,
 
-          `https://www.lookupzone.me/users/group`,
+          // `https://www.lookupzone.me/users/group`,
         {
           name: groupChatName,
           users: JSON.stringify(selectedUsers.map((u) => u._id)),

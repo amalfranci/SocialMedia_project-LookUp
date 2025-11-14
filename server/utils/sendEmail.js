@@ -6,7 +6,6 @@ import Verification from "../models/emailVerification.js";
 import passwordReset from "../models/passwordReset.js";
 
 dotenv.config();
-
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
@@ -18,6 +17,8 @@ const transporter = nodemailer.createTransport({
 });
 export const sendVerificationEmail = async (user, res) => {
   const { _id, email, firstName } = user;
+
+  console.log("user in sendVerificationEmail ", user);
 
   const token = _id + uuidv4();
   const link = process.env.APP_URL + "users/verify/" + _id + "/" + token;
@@ -57,8 +58,7 @@ export const sendVerificationEmail = async (user, res) => {
     });
 
     if (newVerifiedEmail) {
-      transporter
-        .sendMail(mailOption)
+      transporter.sendMail(mailOption)
         .then(() => {
           res.status(201).send({
             success: "PENDING",
@@ -82,6 +82,7 @@ export const resetPasswordLink = async (user, res) => {
   const token = _id + uuidv4();
   const link =
     process.env.APP_URL + "users/reset-password/" + _id + "/" + token;
+    console.log("reset link ", link);
   const mailOption = {
     from: "lookup621@gmail.com",
     to: email,
