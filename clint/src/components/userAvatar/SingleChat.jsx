@@ -33,7 +33,7 @@ const defaultOptions = {
   },
 };
 
-const ENDPOINT = "http://localhost:8800";
+const ENDPOINT = "http://13.202.235.26:8800";
 var socket, selectedChatCompare;
 
 function SingleChat({ fetchAgain, setFetchAgain }) {
@@ -76,7 +76,7 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
       setLoading(true);
 
       const { data } = await axios.get(
-        `http://localhost:8800/users/${selectedChat._id}`,
+        `http://13.202.235.26:8800/users/${selectedChat._id}`,
 
         // `https://www.lookupzone.me/users/${selectedChat._id}`,
         config
@@ -118,7 +118,7 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
         };
         setNewMessage("");
         const { data } = await axios.post(
-          "http://localhost:8800/users/sendmessage",
+          "http://13.202.235.26:8800/users/sendmessage",
 
           //  "https://www.lookupzone.me/users/sendmessage",
           {

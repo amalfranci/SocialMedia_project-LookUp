@@ -16,7 +16,7 @@ const ChatProvider = ({ children }) => {
     setUser(userInfo);
   }, []);
 
-  const socket = useMemo(() => io("http://localhost:8800"), [])
+  const socket = useMemo(() => io("http://13.202.235.26:8800"), [])
   
     // const socket=useMemo(()=>io("https://www.lookupzone.me"),[])
 

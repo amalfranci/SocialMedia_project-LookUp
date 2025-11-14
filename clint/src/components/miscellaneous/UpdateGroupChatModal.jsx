@@ -47,7 +47,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
         },
       };
       const { data } = await axios.get(
-        `http://localhost:8800/users/all-users?search=${search}`,
+        `http://13.202.235.26:8800/users/all-users?search=${search}`,
 
         //  `https://www.lookupzone.me/users/all-users?search=${search}`,
         config
@@ -79,7 +79,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
         },
       };
       const { data } = await axios.put(
-        `http://localhost:8800/users/rename-group`,
+        `http://13.202.235.26:8800/users/rename-group`,
 
         //  `https://www.lookupzone.me/users/rename-group`,
         {
@@ -139,7 +139,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
         },
       };
       const { data } = await axios.put(
-        `http://localhost:8800/users/adduser`,
+        `http://13.202.235.26:8800/users/adduser`,
 
         //  `https://www.lookupzone.me/users/adduser`,
         {
@@ -187,7 +187,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
         },
       };
       const { data } = await axios.put(
-        `http://localhost:8800/users/groupremove`,
+        `http://13.202.235.26:8800/users/groupremove`,
 
         // `https://www.lookupzone.me/users/groupremove`,
         {

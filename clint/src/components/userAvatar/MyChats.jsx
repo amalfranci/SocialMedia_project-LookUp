@@ -25,7 +25,7 @@ const MyChats = ({ fetchAgain }) => {
       };
 
       const { data } = await axios.get(
-        "http://localhost:8800/users/fetch-data",
+        "http://13.202.235.26:8800/users/fetch-data",
 
           // "https://www.lookupzone.me/users/fetch-data",
         config

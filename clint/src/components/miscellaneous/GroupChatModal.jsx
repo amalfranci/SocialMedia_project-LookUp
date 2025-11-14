@@ -46,7 +46,7 @@ function GroupChatModal({ children }) {
         },
       };
       const { data } = await axios.get(
-        `http://localhost:8800/users/all-users?search=${search}`,
+        `http://13.202.235.26:8800/users/all-users?search=${search}`,
 
           //  `https://www.lookupzone.me/users/all-users?search=${search}`,
         config
@@ -100,7 +100,7 @@ function GroupChatModal({ children }) {
         },
       };
       const { data } = await axios.post(
-        `http://localhost:8800/users/group`,
+        `http://13.202.235.26:8800/users/group`,
 
           // `https://www.lookupzone.me/users/group`,
         {
